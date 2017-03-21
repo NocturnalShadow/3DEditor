@@ -14,16 +14,15 @@ private:
     QMatrix4x4 projection;
     QMatrix4x4 view;
 
-    float fov           = 75.f;
-    float aspect        = 800.f / 600.f;
+    float fov           = 60.0f;
+    float aspect        = 4.0f/3.0f;
 
 public:
-    Camera(float _fov = 75.f, float _aspect = 800.f / 600.f)
+    Camera(float _fov = 60.0f, float _aspect = 4.0f/3.0f)
          : fov{ _fov }
     {
         projection.perspective(_fov, _aspect, 0.1f, 100.f);
         view.lookAt(position, position + forward, up);
-        //view.lookAt({0.0f, 0.0f,-1.0f}, {0.0f,0.0f,0.0f}, {0.0f, 1.0f, 0.0f});
     }
 
 public:
@@ -33,9 +32,21 @@ public:
 
     QVector3D  GetPosition()     const { return position;           }
 
-    void SetPosition(const QVector3D& _position)
+    void MoveTo(const QVector3D& _position)
     {
         position = _position;
+        view.setToIdentity();
+        view.lookAt(position, position + forward, up);
+    }
+    void LookTo(const QVector3D& direction)
+    {
+        forward = direction;
+        view.setToIdentity();
+        view.lookAt(position, position + forward, up);
+    }
+    void LookAt(const QVector3D& point)
+    {
+        forward = point - position;
         view.setToIdentity();
         view.lookAt(position, position + forward, up);
     }

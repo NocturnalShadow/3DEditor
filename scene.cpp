@@ -4,7 +4,13 @@
 Scene::Scene(QWidget* parent)
     : QOpenGLWidget(parent), program{"basicShader"}
 {
-     setMinimumSize(800,600);
+    QSurfaceFormat format;
+    format.setVersion(4, 3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    format.setSamples(16);
+    setFormat(format);
+
+    setMinimumSize(800,600);
 }
 
 
@@ -18,9 +24,13 @@ void Scene::initializeGL()
     initializeOpenGLFunctions();
     program.InitShader();
 
+    qDebug((char*)glGetString(GL_VERSION));
+    qDebug() << format().version();
+    qDebug() << format().profile();
+
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     glClearColor(0.15f, 0.145f, 0.15f, 1.0f);
 }
@@ -37,6 +47,7 @@ void Scene::paintGL()
 }
 
 
+#include "gl_debug.h"
 
 // =====================================================================
 // ============== Some temporary visual testing functions ==============
@@ -44,67 +55,67 @@ void Scene::paintGL()
 
 void Scene::just_a_test()
 {
-    static GLfloat const square[] =
-    {
-        -0.5f,  -0.5f,  0.0f,
-        -0.5f,  0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.5f, 0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f
-    };
-
-    QColor square_color(222, 99, 99, 255);
-
-    static GLfloat const line[] =
-    {
-         -0.5f,  0.0f,  0.55f,
-         0.5f,  0.0f, 0.55f,
-        -0.5f,  0.0f,  -0.55f,
-        0.5f,  0.0f, -0.55f
-    };
-    QColor line_color(0, 255, 0, 255);
-
-    static float angle = 0;
-    static float posX = 0;
-    static float delta = 0.02f;
-
-
-//              *** Qt datastructures test ***
-//  #square
-//    QMatrix4x4 model;
-//    QMatrix4x4 view;
-//    QMatrix4x4 projection;
-
-//    model.translate(0.0f, 0.0f, 3.0f);
-//    model.rotate(angle += 0.4f, 1, 0, 0);
-//    view.lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
-//    projection.perspective(70.0f, (float) 800 / (float) 600, 0.01f, 25.0f);
-
-//    program.Update(model, view, projection, square_color);
-
-
-//              *** Transform class test ***
-//  #square
-    // > Simple translation
+    static uint frame = 0;
     Transform transformation;
-    transformation.Position().setZ(3.0f);
+    transformation.Position().setZ(2);
+    transformation.Rotation().setY(100.0f * frame / 150);
 
-    // > Camera move
-    if(abs(posX) > 2) delta = -delta;
-    camera.SetPosition({posX += delta, 0.0f, 0.0f});
+    program.Bind();
 
-    program.Update(transformation, camera, square_color);
+    //QMatrix4x4 matrix;
+    //matrix.perspective(60.0f, 4.0f/3.0f, 0.1f, 100.0f);
+    //matrix.lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
+    //matrix.translate({0.0f, 0.0f, 2.0f});
+    //matrix *= transformation.Model();
+    //matrix.rotate(100.0f * m_frame / screen()->refreshRate(), 0, 1, 0);
 
-    program.BindData(square);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    camera.MoveTo({0.0f, 2.0f, -1.5f});
+    camera.LookAt({0.0f, 1.0f, 0.0f});
+    //program.Update(matrix);
+    program.Update(transformation, camera);
 
-//  #line
-    // > Simple rotation
-    transformation.Rotation().setX(angle += 0.7f);
+    std::vector<QVector3D> vertices =
+    {
+        {-1.0,-1.0,1.0},
+        {-1.0,1.0,1.0},
+        {1.0,1.0,1.0},
+        {1.0,-1.0,1.0},
+        {-1.0,-1.0,-1.0},
+        {-1.0,1.0,-1.0},
+        {1.0,1.0,-1.0},
+        {1.0,-1.0,-1.0},
+    };
+    std::vector<uint> indices =
+    {
+        0, 3, 2,
+        0, 2, 1,
+        2, 3, 7,
+        2, 7, 6,
+        0, 4, 7,
+        0, 7, 3,
+        1, 2, 6,
+        1, 6, 5,
+        4, 5, 6,
+        4, 6, 7,
+        0, 1, 5,
+        0, 5, 4
+    };
 
-    program.Update(transformation, camera, line_color);
+     std::vector<QVector4D> colors =
+     {
+         {0.0,0.0,0.0, 0.0},
+         {1.0,0.0,0.0, 0.0},
+         {1.0,1.0,0.0, 0.0},
+         {0.0,1.0,0.0, 0.0},
+         {0.0,0.0,1.0, 0.0},
+         {1.0,0.0,1.0, 0.0},
+         {1.0,1.0,1.0, 0.0},
+         {0.0,1.0,1.0, 0.0},
+     };
 
-    program.BindData(line);
-    glDrawArrays(GL_LINES, 0, 4);
+    Model model(vertices, colors, indices);
+
+    model.BindShaderProgram(program.Get());
+    model.Draw(this);
+    frame++;
 }

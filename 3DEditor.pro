@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+CONFIG += c++14
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -26,10 +27,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES +=  main.cpp            \
             display.cpp         \
             scene.cpp           \
-            shader_program.cpp
+            shader_program.cpp \
+    mesh.cpp \
+    model.cpp \
+    gl_debug.cpp
 
 HEADERS  += display.h           \
             scene.h             \
             camera.h            \
             shader_program.h \
-            transform.h
+            transform.h \
+    mesh.h \
+    model.h \
+    gl_debug.h

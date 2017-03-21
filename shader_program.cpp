@@ -4,46 +4,25 @@
 
 void ShaderProgram::InitShader()
 {
-//    if(!program.addShaderFromSourceFile(QOpenGLShader::Vertex, program_name +".vs"));
-//    if(!program.addShaderFromSourceFile(QOpenGLShader::Fragment, program_name +".fs"));
-
-    if(!program.addShaderFromSourceCode(QOpenGLShader::Vertex,
-        "attribute highp vec4 vertex;\n"
-        "uniform highp mat4 matrix;\n"
-        "void main(void)\n"
-        "{\n"
-        "   gl_Position = matrix * vertex;\n"
-        "}"));
-    if(!program.addShaderFromSourceCode(QOpenGLShader::Fragment,
-        "uniform mediump vec4 color;\n"
-        "void main(void)\n"
-        "{\n"
-        "   gl_FragColor = color;\n"
-        "}"));
-
-    if(!program.link());
-    if(!program.bind());
+    if(!program.addShaderFromSourceFile(QOpenGLShader::Vertex, program_name +".vs"))
+        qDebug() << "Cannot compile vertex shader " + program_name +".vs" << endl;
+    if(!program.addShaderFromSourceFile(QOpenGLShader::Fragment, program_name +".fs"))
+        qDebug() << "Cannot compile fragment shader " + program_name +".fs" << endl;
+    if(!program.link())
+        qDebug() << "Cannot link shader program " + program_name << endl;
 }
 
-void ShaderProgram::Update(const Transform& transformation, const Camera& camera, const QColor& color)
+void ShaderProgram::Update(const Transform& transformation, const Camera& camera)
 {
-    int matrixLocation = program.uniformLocation("matrix");
-    int colorLocation = program.uniformLocation("color");
-    program.setUniformValue(matrixLocation, camera.ViewProjection() * transformation.Model());
-    program.setUniformValue(colorLocation, color);
+    program.setUniformValue("matrix", camera.ViewProjection() * transformation.Model());
 }
 
-void ShaderProgram::Update(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection, const QColor& color)
+void ShaderProgram::Update(const QMatrix4x4 &matrix)
 {
-    int matrixLocation = program.uniformLocation("matrix");
-    int colorLocation = program.uniformLocation("color");
-    program.setUniformValue(matrixLocation, projection * view * model);
-    program.setUniformValue(colorLocation, color);
+     program.setUniformValue("matrix", matrix);
 }
 
-void ShaderProgram::BindData(const GLfloat* data)
+void ShaderProgram::Update(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection)
 {
-    int vertexLocation = program.attributeLocation("vertex");
-    program.enableAttributeArray(vertexLocation);
-    program.setAttributeArray(vertexLocation, data, 3);
+    program.setUniformValue(program.uniformLocation("matrix"), projection * view * model);
 }
