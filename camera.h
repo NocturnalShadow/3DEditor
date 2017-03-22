@@ -14,14 +14,14 @@ private:
     QMatrix4x4 projection;
     QMatrix4x4 view;
 
-    float fov           = 60.0f;
-    float aspect        = 4.0f/3.0f;
+    float fov           = 70.0f;
+    float aspect        = 16.0f/9.0f;
 
 public:
-    Camera(float _fov = 60.0f, float _aspect = 4.0f/3.0f)
+    Camera(float _fov = 70.0f, float _aspect = 16.0f/9.0f)
          : fov{ _fov }
     {
-        projection.perspective(_fov, _aspect, 0.1f, 100.f);
+        projection.perspective(_fov, _aspect, 2.0f, 100.f);
         view.lookAt(position, position + forward, up);
     }
 
@@ -54,11 +54,29 @@ public:
     void ChangeAspect(int width, int height)
     {
         aspect = (float) width / (float) height;
-        projection.perspective(fov, aspect, 0.1f, 30.f);
+        projection.setToIdentity();
+        projection.perspective(fov, aspect, 2.0f, 30.f);
     }
     void ChangeFieldOfView(float _fov)
     {
         fov = _fov;
-        projection.perspective(fov, aspect, 0.1f, 30.f);
+        projection.setToIdentity();
+        projection.perspective(fov, aspect, 2.0f, 100.f);
+    }
+
+    void ResetPosition()
+    {
+        position  = { 0.0f, 0.0f, 0.0f };
+        forward   = { 0.0f, 0.0f, 1.0f };
+        up        = { 0.0f, 1.0f, 0.0f };
+
+        fov           = 60.0f;
+        aspect        = 16.0f/9.0f;
+
+        view.setToIdentity();
+        view.lookAt(position, position + forward, up);
+
+        projection.setToIdentity();
+        projection.perspective(fov, aspect, 2.0f, 100.f);
     }
 };

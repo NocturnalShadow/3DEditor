@@ -1,5 +1,5 @@
 #include "scene.h"
-
+#include "scene_item.h"
 
 Scene::Scene(QWidget* parent)
     : QOpenGLWidget(parent), program{"basicShader"}
@@ -10,7 +10,7 @@ Scene::Scene(QWidget* parent)
     format.setSamples(16);
     setFormat(format);
 
-    setMinimumSize(800,600);
+    setMinimumSize(1366,768);
 }
 
 
@@ -56,23 +56,14 @@ void Scene::paintGL()
 void Scene::just_a_test()
 {
     static uint frame = 0;
-    Transform transformation;
-    transformation.Position().setZ(2);
-    transformation.Rotation().setY(100.0f * frame / 150);
-
     program.Bind();
 
-    //QMatrix4x4 matrix;
-    //matrix.perspective(60.0f, 4.0f/3.0f, 0.1f, 100.0f);
-    //matrix.lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
-    //matrix.translate({0.0f, 0.0f, 2.0f});
-    //matrix *= transformation.Model();
-    //matrix.rotate(100.0f * m_frame / screen()->refreshRate(), 0, 1, 0);
+//    QMatrix4x4 matrix;
+//    matrix.perspective(60.0f, 16.0f/9.0f, 1.0f, 100.0f);
+//    matrix.lookAt({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f, 0.0f});
+//    matrix.translate({0.0f, 0.0f, 2.0f});
 
-    camera.MoveTo({0.0f, 2.0f, -1.5f});
-    camera.LookAt({0.0f, 1.0f, 0.0f});
-    //program.Update(matrix);
-    program.Update(transformation, camera);
+    camera.MoveTo({0.0f, 0.0f, -4.5f});
 
     std::vector<QVector3D> vertices =
     {
@@ -103,19 +94,33 @@ void Scene::just_a_test()
 
      std::vector<QVector4D> colors =
      {
-         {0.0,0.0,0.0, 0.0},
-         {1.0,0.0,0.0, 0.0},
-         {1.0,1.0,0.0, 0.0},
-         {0.0,1.0,0.0, 0.0},
-         {0.0,0.0,1.0, 0.0},
-         {1.0,0.0,1.0, 0.0},
-         {1.0,1.0,1.0, 0.0},
-         {0.0,1.0,1.0, 0.0},
+         {0.0, 0.0, 0.0, 0.0},
+         {1.0, 0.0, 0.0, 0.0},
+         {1.0, 1.0, 0.0, 0.0},
+         {0.0, 1.0, 0.0, 0.0},
+         {0.0, 0.0, 1.0, 0.0},
+         {1.0, 0.0, 1.0, 0.0},
+         {1.0, 1.0, 1.0, 0.0},
+         {0.0, 1.0, 1.0, 0.0}
      };
+     Model model(vertices, colors, indices);
+     program.Update(camera);
 
-    Model model(vertices, colors, indices);
+    if(frame == 0)
+    {
+        Model model(vertices, colors, indices);
+        add_item("TheCube", SceneItem(model));
+    }
+    program.Update(camera);
+    glViewport(0, 0, 1366, 768);
 
-    model.BindShaderProgram(program.Get());
-    model.Draw(this);
+    items["TheCube"].Transform().Rotation().setY(100.0f * frame / 150);
+    items["TheCube"].Transform().SetPosition({0.0, 0.0, 2.0});
+    items["TheCube"].Draw(this);
+    items["TheCube"].Transform().SetPosition({0.0, 2.0, 2.0});
+    items["TheCube"].Draw(this);
+    items["TheCube"].Transform().SetPosition({0.0, -2.0, 2.0});
+    items["TheCube"].Draw(this);
+
     frame++;
 }

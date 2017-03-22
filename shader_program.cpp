@@ -12,17 +12,24 @@ void ShaderProgram::InitShader()
         qDebug() << "Cannot link shader program " + program_name << endl;
 }
 
-void ShaderProgram::Update(const Transform& transformation, const Camera& camera)
+void ShaderProgram::Update(const Camera &camera)
 {
-    program.setUniformValue("matrix", camera.ViewProjection() * transformation.Model());
+    program.setUniformValue("uni_ProjectionView", camera.ViewProjection());
 }
 
-void ShaderProgram::Update(const QMatrix4x4 &matrix)
+void ShaderProgram::Update(const Transformation &transformation)
 {
-     program.setUniformValue("matrix", matrix);
+    program.setUniformValue("uni_Model", transformation.Model());
+}
+
+void ShaderProgram::Update(const Transformation& transformation, const Camera& camera)
+{
+    Update(camera);
+    Update(transformation);
 }
 
 void ShaderProgram::Update(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection)
 {
-    program.setUniformValue(program.uniformLocation("matrix"), projection * view * model);
+    program.setUniformValue("uni_Model", model);
+    program.setUniformValue(program.uniformLocation("uni_ProjectionView"), projection * view);
 }

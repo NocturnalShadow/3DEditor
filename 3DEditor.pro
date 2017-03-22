@@ -30,7 +30,8 @@ SOURCES +=  main.cpp            \
             shader_program.cpp \
     mesh.cpp \
     model.cpp \
-    gl_debug.cpp
+    gl_debug.cpp \
+    scene_item.cpp
 
 HEADERS  += display.h           \
             scene.h             \
@@ -39,4 +40,5 @@ HEADERS  += display.h           \
             transform.h \
     mesh.h \
     model.h \
-    gl_debug.h
+    gl_debug.h \
+    scene_item.h

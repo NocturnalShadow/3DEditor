@@ -22,9 +22,8 @@ void Model::BindShaderProgram(QOpenGLShaderProgram& program)
 
 void Model::InitializeModel()
 {
-    mesh->InitializeMesh();
-    GenerateObjects();
-    InitializeBuffers();
+    InitializeBaseModel();
+    is_initialized = true;
 }
 
 void Model::Draw(QOpenGLFunctions_4_3_Core* context)
@@ -53,6 +52,13 @@ void Model::Draw(QOpenGLFunctions* context)
     }
 
     vertexArrayObject.release();
+}
+
+
+void Model::InitializeBaseModel()
+{
+    GenerateObjects();
+    InitializeBuffers();
 }
 
 void Model::GenerateObjects()

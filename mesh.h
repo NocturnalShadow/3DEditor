@@ -6,7 +6,7 @@
 
 class Mesh
 {
-public:
+protected:
     std::vector<QVector3D> positions;
     std::vector<QVector3D> normals;
 
@@ -21,13 +21,19 @@ public:
         CalculateNormals();
     }
 
-    const QVector3D* Positions()   const { return positions.data();   }
-    const QVector3D* Normals()     const { return normals.data();     }
-
     size_t SizeOfPositions()       const { return positions.size() * sizeof(positions[0]);  }
     size_t SizeOfNormals()         const { return normals.size() * sizeof(normals[0]);      }
 
-    virtual uint VertexCount()     const { return (uint) positions.size();   }
+    const QVector3D* Positions()   const { return positions.data();        }
+    const QVector3D* Normals()     const { return normals.data();          }
+
+    virtual uint VertexCount()     const { return (uint) positions.size(); }
+    virtual Mesh* clone()          const
+    {
+        Mesh* mesh                   = new Mesh(positions);
+        mesh->normals                = normals;
+        return mesh;
+    }
 
 private:
     virtual void CalculateNormals();
@@ -50,7 +56,15 @@ public:
      size_t SizeOfIndices()        const { return indices.size() * sizeof(indices[0]);  }
      virtual uint VertexCount()    const { return (uint) indices.size();                }
 
+     IndexedMesh* clone() const override
+     {
+         IndexedMesh* indexed_mesh   = new IndexedMesh(positions, indices);
+         indexed_mesh->normals       = normals;
+         return indexed_mesh;
+     }
+
 private:
     void CalculateNormals() override;
+
 };
 

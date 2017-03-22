@@ -17,22 +17,33 @@
 class Model
 {
 private:
-    std::shared_ptr<Mesh> mesh;
+    std::unique_ptr<Mesh> mesh;
     std::vector<QVector4D> colors;
 
     QOpenGLVertexArrayObject vertexArrayObject;
     std::vector<QOpenGLBuffer> vertexBufferObjects;
 
+protected:
+    bool is_initialized = false;
+
 public:
     Model(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors)
-        : mesh{new Mesh(positions)}, colors{ colors }
+        : mesh{ new Mesh(positions) }, colors{ colors }
     {
-        InitializeModel();
+        mesh->InitializeMesh();
     }
     Model(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors, const std::vector<uint>& indices)
-        : mesh{new IndexedMesh(positions, indices)}, colors{ colors }
+        : mesh{ new IndexedMesh(positions, indices) }, colors{ colors }
     {
-        InitializeModel();
+        mesh->InitializeMesh();
+    }
+    Model(const Model& model)
+        : mesh{ model.mesh->clone() }, colors{ model.colors }
+    {
+    }
+    Model(Model&& model)
+        : mesh{ std::move(model.mesh) }, colors{ std::move(model.colors) }
+    {
     }
 
 public:
@@ -42,9 +53,13 @@ public:
     virtual void Draw(QOpenGLFunctions_4_3_Core* context);
     virtual void Draw(QOpenGLFunctions* context);
 
+    bool isInitialized() const { return is_initialized; }
+
+protected:
+    void InitializeBaseModel();
+
 private:
     void GenerateObjects();
     void InitializeBuffers();
-
 };
 
