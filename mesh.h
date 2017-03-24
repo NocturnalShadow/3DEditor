@@ -56,12 +56,7 @@ public:
      size_t SizeOfIndices()        const { return indices.size() * sizeof(indices[0]);  }
      virtual uint VertexCount()    const { return (uint) indices.size();                }
 
-     IndexedMesh* clone() const override
-     {
-         IndexedMesh* indexed_mesh   = new IndexedMesh(positions, indices);
-         indexed_mesh->normals       = normals;
-         return indexed_mesh;
-     }
+     IndexedMesh* clone() const override;
 
 private:
     void CalculateNormals() override;

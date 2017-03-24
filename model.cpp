@@ -1,6 +1,28 @@
 #include "model.h"
 
 
+Model::Model(const std::vector<QVector3D> &positions, std::vector<QVector4D> colors)
+    : mesh{ new Mesh(positions) }, colors{ colors }
+{
+    mesh->InitializeMesh();
+}
+
+Model::Model(const std::vector<QVector3D> &positions, std::vector<QVector4D> colors, const std::vector<uint> &indices)
+    : mesh{ new IndexedMesh(positions, indices) }, colors{ colors }
+{
+    mesh->InitializeMesh();
+}
+
+Model::Model(const Model &model)
+    : mesh{ model.mesh->clone() }, colors{ model.colors }
+{
+}
+
+Model::Model(Model &&model)
+    : mesh{ std::move(model.mesh) }, colors{ std::move(model.colors) }
+{
+}
+
 void Model::BindShaderProgram(QOpenGLShaderProgram& program)
 {
     vertexArrayObject.bind();
@@ -26,29 +48,29 @@ void Model::InitializeModel()
     is_initialized = true;
 }
 
-void Model::Draw(QOpenGLFunctions_4_3_Core* context)
+void Model::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
 {
     vertexArrayObject.bind();
 
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get())) {
-        context->glDrawElements(GL_TRIANGLES, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
+        glFunctions->glDrawElements(GL_TRIANGLES, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
     }
     else {
-        context->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
+        glFunctions->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
     }
 
     vertexArrayObject.release();
 }
 
-void Model::Draw(QOpenGLFunctions* context)
+void Model::Draw(QOpenGLFunctions* glFunctions)
 {
     vertexArrayObject.bind();
 
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get())) {
-        context->glDrawElements(GL_TRIANGLES, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
+        glFunctions->glDrawElements(GL_TRIANGLES, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
     }
     else {
-        context->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
+        glFunctions->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
     }
 
     vertexArrayObject.release();

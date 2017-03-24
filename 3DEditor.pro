@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-CONFIG += c++14
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -31,6 +31,7 @@ SOURCES +=  main.cpp            \
     mesh.cpp \
     model.cpp \
     gl_debug.cpp \
+    scene_view.cpp \
     scene_item.cpp
 
 HEADERS  += display.h           \
@@ -41,4 +42,6 @@ HEADERS  += display.h           \
     mesh.h \
     model.h \
     gl_debug.h \
-    scene_item.h
+    scene_item.h \
+    scene_view.h \
+    scene_model.h

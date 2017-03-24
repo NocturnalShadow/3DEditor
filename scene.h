@@ -1,46 +1,41 @@
 #pragma once
 
+#include "gl_debug.h"
+
 #include "camera.h"
 #include "shader_program.h"
 #include "model.h"
+
+#include "scene_model.h"
+#include "scene_view.h"
 #include "scene_item.h"
 
-#include <map>
-#include <utility>
+#include <memory>
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_4_3_Core>
 
+
 class Scene : public QOpenGLWidget, public QOpenGLFunctions_4_3_Core
 {
 private:
-    Camera camera;
-    ShaderProgram program;
-    std::map<std::string, SceneItem> items;
+    std::unique_ptr<SceneModel> scene_model = nullptr;
+    std::unique_ptr<SceneView>  scene_view  = nullptr;
 
 public:
     Scene(QWidget *parent = nullptr);
-    ~Scene();
+    ~Scene() = default;
 
 protected:
     void initializeGL() override;
     void resizeGL(int width, int height);
     void paintGL() override;
 
-private:
-    void just_a_test();
-
 public:
-    void add_item(const std::string& item_name, const SceneItem& item)
-    {
-        items.emplace(std::make_pair(item_name, item));
-        items[item_name].BindShaderProgram(&program);
-    }
-    void add_item(const std::string& item_name, SceneItem&& item)
-    {
-        items.emplace(std::make_pair(item_name, std::move(item)));
-        items[item_name].BindShaderProgram(&program);
-    }
+    void AddItem(const std::string& item_name, const SceneItem& item);
+    void AddItem(const std::string& item_name, SceneItem&& item);
+
+    void just_a_test();
 };
 

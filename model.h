@@ -27,24 +27,10 @@ protected:
     bool is_initialized = false;
 
 public:
-    Model(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors)
-        : mesh{ new Mesh(positions) }, colors{ colors }
-    {
-        mesh->InitializeMesh();
-    }
-    Model(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors, const std::vector<uint>& indices)
-        : mesh{ new IndexedMesh(positions, indices) }, colors{ colors }
-    {
-        mesh->InitializeMesh();
-    }
-    Model(const Model& model)
-        : mesh{ model.mesh->clone() }, colors{ model.colors }
-    {
-    }
-    Model(Model&& model)
-        : mesh{ std::move(model.mesh) }, colors{ std::move(model.colors) }
-    {
-    }
+    Model(Model&& model);
+    Model(const Model& model);
+    Model(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors);
+    Model(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors, const std::vector<uint>& indices);
 
 public:
     void BindShaderProgram(QOpenGLShaderProgram& program);

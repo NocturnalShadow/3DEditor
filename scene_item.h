@@ -10,7 +10,6 @@
 #include <QOpenGLFunctions_4_3_Core>
 
 
-class Scene;
 class SceneItem
 {
 private:
@@ -20,56 +19,18 @@ private:
 
 public:
     SceneItem() = default;
-    SceneItem(const Model& _model, ShaderProgram* _program = nullptr)
-        : model{ std::make_shared<Model>(_model) },
-          program{ _program }
-    {
-        model->InitializeModel();
-    }
-    SceneItem(Model&& _model)
-        : model{ std::make_shared<Model>(std::move(_model)) }
-    {
-        if(!model->isInitialized()) {
-            model->InitializeModel();
-        }
-    }
-    SceneItem(const SceneItem& item)
-        : model{ std::make_shared<Model>(*item.model) },
-          transformation{ item.transformation },
-          program{ item.program }
-    {
-        model->InitializeModel();
-    }
+    SceneItem(Model&& _model);
+    SceneItem(const SceneItem& item);
+    SceneItem(const Model& _model, ShaderProgram* _program = nullptr);
 
-    SceneItem& operator=(const SceneItem& item)
-    {
-        model = std::make_shared<Model>(*item.model);
-        transformation = item.transformation;
-        program = item.program;
-        model->InitializeModel();
-        return *this;
-    }
+    SceneItem& operator=(const SceneItem& item);
 
 public:
-    Transformation& Transform() {
-        return transformation;
-    }
+    Transformation& Transform() { return transformation; }
 
-    void BindShaderProgram(ShaderProgram* _program)
-    {
-        program = _program;
-        model->BindShaderProgram(program->Get());
-    }
+    void BindShaderProgram(ShaderProgram* _program);
 
-    void Draw(QOpenGLFunctions* scene)
-    {
-        program->Update(transformation);
-        model->Draw(scene);
-    }
-    void Draw(QOpenGLFunctions_4_3_Core* scene)
-    {
-        program->Update(transformation);
-        model->Draw(scene);
-    }
+    void Draw(QOpenGLFunctions* view);
+    void Draw(QOpenGLFunctions_4_3_Core* view);
 };
 

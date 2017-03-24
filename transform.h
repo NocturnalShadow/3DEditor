@@ -22,11 +22,11 @@ public:
 public:
     const QVector3D& GetPos()       const           { return position;	}
     const QVector3D& GetRot()       const           { return rotation;	}
-    const QVector3D& GetScale()     const           { return scale; }
+    const QVector3D& GetScale()     const           { return scale;     }
 
     void SetPosition(const QVector3D& _position)    { position = _position; }
     void SetRotation(const QVector3D& _rotation)    { rotation = _rotation; }
-    void SetScale   (const QVector3D& _scale)       { scale = _scale; }
+    void SetScale   (const QVector3D& _scale)       { scale = _scale;       }
 
     QVector3D& Position()                           { return position;	}
     QVector3D& Rotation()                           { return rotation;	}
