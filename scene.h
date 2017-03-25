@@ -12,6 +12,7 @@
 
 #include <memory>
 
+#include <QMouseEvent>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_4_3_Core>
@@ -37,5 +38,11 @@ public:
     void AddItem(const std::string& item_name, SceneItem&& item);
 
     void just_a_test();
+
+public:
+    void mouseMoveEvent(QMouseEvent* event){
+       if(event->buttons() == Qt::MidButton && event->modifiers() == Qt::AltModifier)
+           qDebug() << event->pos();
+    }
 };
 

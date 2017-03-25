@@ -1,5 +1,8 @@
 #include "scene.h"
 #include "scene_item.h"
+#include "camera.h"
+#include "glm/glm.hpp"
+#include "glm/gtx/transform.hpp"
 
 Scene::Scene(QWidget* parent)
     : QOpenGLWidget(parent)
@@ -108,15 +111,49 @@ void Scene::just_a_test()
         Model model(vertices, colors, indices);
         auto scene_item = SceneItem(model);
         AddItem("TheCube", scene_item);
-    }
+        scene_view->Camera()->MoveTo({3.0f, 0.0f, -6.0f});
 
+        // Some debugging trying to figure out
+        // why glm and Qt give differrent results for perspective matrix
+        QMatrix4x4 qPerspective;
+        qPerspective.setToIdentity();
+        qDebug() << "Perspectives";
+        qDebug() << "Qt";
+        qPerspective.perspective(60.0f, 4.0f / 3.0f, 0.1f, 100.0f);                             // the same !!!
+        qPerspective = qPerspective.transposed();
+        for(int i = 0; i < 4; ++i)
+                qDebug() << qPerspective.row(i)[0] << " " << qPerspective.row(i)[1]
+                         << " " << qPerspective.row(i)[2] << " " << qPerspective.row(i)[3]      //     ||
+                         << endl;
+        qDebug() << "GLM";
+        glm::mat4 glmPerspective = glm::perspective(60.0f, 4.0f / 3.0f, 0.1f, 100.0f);          // the same !!!
+        for(int i = 0; i < 4; ++i)
+                qDebug() << glmPerspective[i][0] << " " << glmPerspective[i][1]
+                         << " " << glmPerspective[i][2] << " " << glmPerspective[i][3] << endl;
+
+        qDebug() << "Views";
+        qDebug() << "Qt";
+        QMatrix4x4 qView;
+        qView.setToIdentity();
+        qView.lookAt({3.0f, 0.0f, -6.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
+        qView = qView.transposed();
+        for(int i = 0; i < 4; ++i)
+                qDebug() << qView.row(i)[0] << " " << qView.row(i)[1] << " " << qView.row(i)[2] << " " << qView.row(i)[3];
+        qDebug() << "GLM";
+        glm::mat4 glmView = glm::lookAt(glm::vec3{3.0f, 0.0f, -6.0f}, glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.0f, 1.0f});
+        for(int i = 0; i < 4; ++i)
+                qDebug() << glmView[i][0] << " " << glmView[i][1] << " " << glmView[i][2] << " " << glmView[i][3];
+    }
+if(frame < 70){
     scene_model->Item("TheCube").Transform().Rotation().setY(100.0f * frame / 150);
-    scene_model->Item("TheCube").Transform().SetPosition({0.0, 0.0, 6.0});
+    scene_model->Item("TheCube").Transform().SetPosition({0.0f, 0.0f, 0.0f + sin(frame / 60.0f)*2.5f});
+}
     scene_view->Paint();
-    scene_model->Item("TheCube").Transform().SetPosition({0.0, 2.0, 6.0});
-    scene_view->Paint();
-    scene_model->Item("TheCube").Transform().SetPosition({0.0, -2.0, 6.0});
-    scene_view->Paint();
+
+//    scene_model->Item("TheCube").Transform().SetPosition({0.0, 2.0, 6.0});
+//    scene_view->Paint();
+//    scene_model->Item("TheCube").Transform().SetPosition({0.0, -4.0, 6.0});
+//    scene_view->Paint();
 
     frame++;
 }

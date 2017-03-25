@@ -26,7 +26,7 @@ public:
 
     void SetPosition(const QVector3D& _position)    { position = _position; }
     void SetRotation(const QVector3D& _rotation)    { rotation = _rotation; }
-    void SetScale   (const QVector3D& _scale)       { scale = _scale;       }
+    void SetScale   (const QVector3D& _scale)       { scale    = _scale;    }
 
     QVector3D& Position()                           { return position;	}
     QVector3D& Rotation()                           { return rotation;	}
@@ -35,6 +35,7 @@ public:
     QMatrix4x4 Model()              const
     {
         QMatrix4x4 modelMatrix;
+        modelMatrix.setToIdentity();
         modelMatrix.translate(position);
         modelMatrix.rotate(rotation.x(), QVector3D(1, 0, 0));
         modelMatrix.rotate(rotation.y(), QVector3D(0, 1, 0));

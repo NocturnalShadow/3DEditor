@@ -54,6 +54,8 @@ void Model::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
 
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get())) {
         glFunctions->glDrawElements(GL_TRIANGLES, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
+        //glFunctions->glPointSize(10);
+        //glFunctions->glDrawElements(GL_POINTS, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
     }
     else {
         glFunctions->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
@@ -67,7 +69,7 @@ void Model::Draw(QOpenGLFunctions* glFunctions)
     vertexArrayObject.bind();
 
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get())) {
-        glFunctions->glDrawElements(GL_TRIANGLES, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
+        glFunctions->glDrawElements(GL_POINTS, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
     }
     else {
         glFunctions->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());

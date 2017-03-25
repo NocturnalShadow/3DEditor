@@ -12,7 +12,7 @@ void ShaderProgram::InitShader()
         qDebug() << "Cannot link shader program " + program_name << endl;
 }
 
-void ShaderProgram::Update(const Camera &camera)
+void ShaderProgram::Update(const ICamera &camera)
 {
     program.setUniformValue("uni_ProjectionView", camera.ViewProjection());
 }
@@ -22,7 +22,7 @@ void ShaderProgram::Update(const Transformation &transformation)
     program.setUniformValue("uni_Model", transformation.Model());
 }
 
-void ShaderProgram::Update(const Transformation& transformation, const Camera& camera)
+void ShaderProgram::Update(const Transformation& transformation, const ICamera& camera)
 {
     Update(camera);
     Update(transformation);

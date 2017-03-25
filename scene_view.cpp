@@ -20,7 +20,7 @@ void SceneView::AddItem(SceneItem *item)
 
 void SceneView::Paint()
 {
-    program.Update(camera);
+    program.Update(*camera);
     for(auto item : items) {
         item->Draw(glFunctions);
     }
