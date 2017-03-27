@@ -12,7 +12,9 @@
 
 #include <memory>
 
+#include <QVector2D>
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_4_3_Core>
@@ -40,9 +42,21 @@ public:
     void just_a_test();
 
 public:
-    void mouseMoveEvent(QMouseEvent* event){
-       if(event->buttons() == Qt::MidButton && event->modifiers() == Qt::AltModifier)
-           qDebug() << event->pos();
+    void mouseMoveEvent(QMouseEvent* event)
+    {
+       static QPoint prev_pos = event->pos();
+       QPoint delta = event->pos() - prev_pos;
+       if(event->buttons() == Qt::MidButton)
+       {
+           scene_view->Camera()->Rotate(delta);
+           prev_pos = event->pos();
+       }
     }
+    void wheelEvent(QWheelEvent* event)
+    {
+        float delta = event->delta() / 600.0f;
+        scene_view->Camera()->Zoom(delta);
+    }
+
 };
 

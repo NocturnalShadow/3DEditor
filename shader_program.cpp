@@ -14,12 +14,13 @@ void ShaderProgram::InitShader()
 
 void ShaderProgram::Update(const ICamera &camera)
 {
-    program.setUniformValue("uni_ProjectionView", camera.ViewProjection());
+    program.setUniformValue("View", camera.View());
+    program.setUniformValue("Projection", camera.Projection());
 }
 
 void ShaderProgram::Update(const Transformation &transformation)
 {
-    program.setUniformValue("uni_Model", transformation.Model());
+    program.setUniformValue("Model", transformation.Model());
 }
 
 void ShaderProgram::Update(const Transformation& transformation, const ICamera& camera)
@@ -30,6 +31,7 @@ void ShaderProgram::Update(const Transformation& transformation, const ICamera& 
 
 void ShaderProgram::Update(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection)
 {
-    program.setUniformValue("uni_Model", model);
-    program.setUniformValue(program.uniformLocation("uni_ProjectionView"), projection * view);
+    program.setUniformValue("Model", model);
+    program.setUniformValue(program.uniformLocation("View"), view);
+    program.setUniformValue(program.uniformLocation("Projection"), projection);
 }

@@ -1,24 +1,27 @@
 #pragma once
 
+#include "glm/glm.hpp"
+#include "glm/gtx/transform.hpp"
+
 #include <QVector3D>
 #include <QMatrix4x4>
 
 class ICamera
 {
 protected:
-    QVector3D position  = { 0.0f, 0.0f, 0.0f };
+    QVector3D position;
 
-    float fov           = 70.0f;
-    float aspect        = 16.0f/9.0f;
+    float fov;
+    float aspect;
 
     QMatrix4x4 view;
     QMatrix4x4 projection;
 
 public:
-    ICamera(float _fov = 70.0f, float _aspect = 16.0f/9.0f)
-         : fov{ _fov }, aspect { _aspect }
+    ICamera(const QVector3D& _position, float _fov = 45.0f, float _aspect = 4.0f/3.0f)
+         : position{ _position }, fov{ _fov }, aspect { _aspect }
     {
-        projection.perspective(_fov, _aspect, 2.0f, 100.f);
+        projection.perspective(_fov, _aspect, 0.1f, 100.f);
     }
 
 public:
@@ -34,7 +37,7 @@ public:
     {
         aspect = (float) width / (float) height;
         projection.setToIdentity();
-        projection.perspective(fov, aspect, 2.0f, 30.f);
+        projection.perspective(fov, aspect, 0.1f, 100.f);
     }
     void ChangeFieldOfView(float _fov)
     {
@@ -52,8 +55,8 @@ private:
     QVector3D up        = { 0.0f, 1.0f, 0.0f };
 
 public:
-    FirstPersonCamera(float _fov = 70.0f, float _aspect = 16.0f/9.0f)
-        : ICamera{ _fov, _aspect }
+    FirstPersonCamera(float _fov = 45.0f, float _aspect = 4.0f/3.0f)
+        : ICamera{ {0.0f, 0.0f, 0.0f}, _fov, _aspect }
     {
         view.lookAt(position, position + forward, up);
     }
@@ -84,14 +87,14 @@ public:
         forward   = { 0.0f, 0.0f, 1.0f };
         up        = { 0.0f, 1.0f, 0.0f };
 
-        fov           = 60.0f;
-        aspect        = 16.0f/9.0f;
+        fov           = 45.0f;
+        aspect        = 4.0f/3.0f;
 
         view.setToIdentity();
         view.lookAt(position, position + forward, up);
 
         projection.setToIdentity();
-        projection.perspective(fov, aspect, 2.0f, 100.f);
+        projection.perspective(fov, aspect, 0.1f, 100.f);
     }
 };
 
@@ -103,12 +106,14 @@ private:
     QVector3D center    = { 0.0f, 0.0f, 0.0f };
     QVector3D up        = { 0.0f, 1.0f, 0.0f };
 
+    QMatrix4x4 centered_rotation;
+
 public:
-    SceneViewCamera(QVector3D _position = {3.0f, 3.0f, -3.0f}, float _fov = 70.0f, float _aspect = 16.0f/9.0f)
-         : ICamera{ _fov, _aspect }
+    SceneViewCamera(QVector3D _position = {3.0f, 3.0f, -3.0f}, float _fov = 45.0f, float _aspect = 4.0f/3.0f)
+         : ICamera{ _position, _fov, _aspect }
     {
-        position = _position;
         view.lookAt(position, center, up);
+        centered_rotation.setToIdentity();
     }
 
 public:
@@ -116,21 +121,33 @@ public:
     {
         position = _position;
         view.setToIdentity();
+        centered_rotation.setToIdentity();
         view.lookAt(position, center, up);
     }
     void LookAt(const QVector3D& _center)
     {
         center = _center;
         view.setToIdentity();
-        view.lookAt(position, center, up);
+        view.lookAt(centered_rotation * position, center, up);
     }
 
-   void RotateAroundCenter(float degHorizontal, float degVertical)
+   void Rotate(float deg_xRot, float deg_yRot)
    {
-        QMatrix4x4 rotation;
-        rotation.rotate(degHorizontal, up);
-        rotation.rotate(degVertical, QVector3D::crossProduct(center - position, up));
-        position = rotation * position;
+        centered_rotation.rotate(deg_xRot, up);
+        centered_rotation.rotate(deg_yRot, QVector3D::crossProduct(center - position, up));
+        view.setToIdentity();
+        view.lookAt(centered_rotation * position, center, {0.0f, 1.0f, 0.0f});
+   }
+
+   void Rotate(QPoint p) {
+        Rotate((float) -p.rx() / 3.0f, (float) -p.ry() / 3.0f);
+   }
+
+   void Zoom(float units)
+   {
+        position += (center - position) * units;
+        view.setToIdentity();
+        view.lookAt(centered_rotation * position, center, {0.0f, 1.0f, 0.0f});
    }
 };
 

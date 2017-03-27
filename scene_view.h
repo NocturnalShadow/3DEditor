@@ -16,7 +16,7 @@ class SceneView
 {
 private:
     ShaderProgram program;
-    std::unique_ptr<ICamera> camera;
+    std::unique_ptr<SceneViewCamera> camera;
     QOpenGLFunctions_4_3_Core* glFunctions;
 
     std::vector<SceneItem*> items;
@@ -31,8 +31,12 @@ public:
     void Initialize();
     void Paint();
     void AddItem(SceneItem* item);
-    void Resize(int width, int height)  { glFunctions->glViewport(0, 0, width, height);       }
-    SceneViewCamera* Camera()           { return static_cast<SceneViewCamera*>(camera.get()); }
-    void BindShader()                   { program.Bind();                                     }
+    void Resize(int width, int height);
+    SceneViewCamera* Camera() {
+        return camera.get();
+    }
+    void BindShader() {
+        program.Bind();
+    }
 };
 

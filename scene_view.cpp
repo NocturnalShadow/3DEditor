@@ -18,6 +18,12 @@ void SceneView::AddItem(SceneItem *item)
     items.push_back(item);
 }
 
+void SceneView::Resize(int width, int height)
+{
+    glFunctions->glViewport(0, 0, width, height);
+    camera->ChangeAspect(width, height);
+}
+
 void SceneView::Paint()
 {
     program.Update(*camera);
