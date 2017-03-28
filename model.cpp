@@ -1,31 +1,43 @@
 #include "model.h"
 
 
-Model::Model(const std::vector<QVector3D> &positions, std::vector<QVector4D> colors)
-    : mesh{ new Mesh(positions) }, colors{ colors }
+IModel::IModel(const std::vector<QVector3D>& positions)
+    : mesh{ new Mesh(positions) },
+      vertexArrayObject{ new QOpenGLVertexArrayObject }
 {
     mesh->InitializeMesh();
 }
 
-Model::Model(const std::vector<QVector3D> &positions, std::vector<QVector4D> colors, const std::vector<uint> &indices)
-    : mesh{ new IndexedMesh(positions, indices) }, colors{ colors }
+IModel::IModel(const std::vector<QVector3D>& positions, const std::vector<uint>& indices)
+    : mesh{ new IndexedMesh(positions, indices) },
+      vertexArrayObject{ new QOpenGLVertexArrayObject }
 {
     mesh->InitializeMesh();
 }
 
-Model::Model(const Model &model)
-    : mesh{ model.mesh->clone() }, colors{ model.colors }
+IModel::IModel(const IModel& model)
+    : mesh{ model.mesh->Clone() },
+      vertexArrayObject{ new QOpenGLVertexArrayObject }
+{
+
+}
+
+IModel::IModel(const Mesh& mesh)
+    : mesh{ mesh.Clone() },
+      vertexArrayObject{ new QOpenGLVertexArrayObject }
 {
 }
 
-Model::Model(Model &&model)
-    : mesh{ std::move(model.mesh) }, colors{ std::move(model.colors) }
+
+void IModel::BindShaderProgram(QOpenGLShaderProgram& program)
 {
+    BindBaseShaderProgram(program);
 }
 
-void Model::BindShaderProgram(QOpenGLShaderProgram& program)
+
+void IModel::BindBaseShaderProgram(QOpenGLShaderProgram& program)
 {
-    vertexArrayObject.bind();
+    vertexArrayObject->bind();
 
     vertexBufferObjects[0].bind();
     program.enableAttributeArray("position");
@@ -35,38 +47,34 @@ void Model::BindShaderProgram(QOpenGLShaderProgram& program)
     program.enableAttributeArray("normal");
     program.setAttributeArray("normal", GL_FLOAT, 0, 3);
 
-    vertexBufferObjects[2].bind();
-    program.enableAttributeArray("color");
-    program.setAttributeArray("color", GL_FLOAT, 0, 4);
-
-    vertexArrayObject.release();
+    vertexArrayObject->release();
 }
 
-void Model::InitializeModel()
+void IModel::InitializeModel()
 {
     InitializeBaseModel();
     is_initialized = true;
 }
 
-void Model::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
+void IModel::DrawBase(QOpenGLFunctions_4_3_Core* glFunctions)
 {
-    vertexArrayObject.bind();
+    vertexArrayObject->bind();
 
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get())) {
         glFunctions->glDrawElements(GL_TRIANGLES, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
-        //glFunctions->glPointSize(10);
-        //glFunctions->glDrawElements(GL_POINTS, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
     }
     else {
         glFunctions->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
     }
 
-    vertexArrayObject.release();
+    vertexArrayObject->release();
 }
 
-void Model::Draw(QOpenGLFunctions* glFunctions)
+
+
+void IModel::DrawBase(QOpenGLFunctions* glFunctions)
 {
-    vertexArrayObject.bind();
+    vertexArrayObject->bind();
 
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get())) {
         glFunctions->glDrawElements(GL_POINTS, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
@@ -75,22 +83,30 @@ void Model::Draw(QOpenGLFunctions* glFunctions)
         glFunctions->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
     }
 
-    vertexArrayObject.release();
+    vertexArrayObject->release();
 }
 
+void IModel::Draw(QOpenGLFunctions* glFunctions)
+{
+    DrawBase(glFunctions);
+}
 
-void Model::InitializeBaseModel()
+void IModel::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
+{
+    DrawBase(glFunctions);
+}
+
+void IModel::InitializeBaseModel()
 {
     GenerateObjects();
     InitializeBuffers();
 }
 
-void Model::GenerateObjects()
+void IModel::GenerateObjects()
 {
-    vertexArrayObject.create();
-    vertexArrayObject.bind();
+    vertexArrayObject->create();
+    vertexArrayObject->bind();
 
-    vertexBufferObjects.emplace_back(QOpenGLBuffer::VertexBuffer);
     vertexBufferObjects.emplace_back(QOpenGLBuffer::VertexBuffer);
     vertexBufferObjects.emplace_back(QOpenGLBuffer::VertexBuffer);
     vertexBufferObjects.emplace_back(QOpenGLBuffer::IndexBuffer);
@@ -98,9 +114,9 @@ void Model::GenerateObjects()
     for(auto& vbo : vertexBufferObjects) { vbo.create(); }
 }
 
-void Model::InitializeBuffers()
+void IModel::InitializeBuffers()
 {
-    vertexArrayObject.bind();
+    vertexArrayObject->bind();
 
     vertexBufferObjects[0].bind();
     vertexBufferObjects[0].allocate(mesh->Positions(), (int)mesh->SizeOfPositions());
@@ -110,16 +126,12 @@ void Model::InitializeBuffers()
     vertexBufferObjects[1].allocate(mesh->Normals(), (int)mesh->SizeOfNormals());
     vertexBufferObjects[1].setUsagePattern(QOpenGLBuffer::StreamDraw);
 
-    vertexBufferObjects[2].bind();
-    vertexBufferObjects[2].allocate(colors.data(), (int)colors.size() * sizeof(colors[0]));
-    vertexBufferObjects[2].setUsagePattern(QOpenGLBuffer::StreamDraw);
-
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get()))
     {
-        vertexBufferObjects[3].bind();
-        vertexBufferObjects[3].allocate(indexed_mesh->Indices(), (int)indexed_mesh->SizeOfIndices());
-        vertexBufferObjects[3].setUsagePattern(QOpenGLBuffer::StaticDraw);
+        vertexBufferObjects[2].bind();
+        vertexBufferObjects[2].allocate(indexed_mesh->Indices(), (int)indexed_mesh->SizeOfIndices());
+        vertexBufferObjects[2].setUsagePattern(QOpenGLBuffer::StaticDraw);
     }
 
-    vertexArrayObject.release();
+    vertexArrayObject->release();
 }

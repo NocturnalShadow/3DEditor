@@ -13,15 +13,16 @@
 class SceneItem
 {
 private:
-    std::shared_ptr<Model> model;
+    std::unique_ptr<IModel> model;
     Transformation transformation;
     ShaderProgram* program;
 
 public:
     SceneItem() = default;
-    SceneItem(Model&& _model);
+    SceneItem(IModel&& _model);
+    SceneItem(SceneItem&& item);
     SceneItem(const SceneItem& item);
-    SceneItem(const Model& _model, ShaderProgram* _program = nullptr);
+    SceneItem(const IModel& _model, ShaderProgram* _program = nullptr);
 
     SceneItem& operator=(const SceneItem& item);
 

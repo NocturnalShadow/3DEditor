@@ -39,10 +39,17 @@ void Mesh::CalculateNormals()
     }
 }
 
-IndexedMesh *IndexedMesh::clone() const
+IndexedMesh* IndexedMesh::Clone() const
 {
     IndexedMesh* indexed_mesh   = new IndexedMesh(positions, indices);
     indexed_mesh->normals       = normals;
+    return indexed_mesh;
+}
+
+IndexedMesh* IndexedMesh::Move()
+{
+    IndexedMesh* indexed_mesh   = new IndexedMesh(std::move(positions), std::move(indices));
+    indexed_mesh->normals       = std::move(normals);
     return indexed_mesh;
 }
 

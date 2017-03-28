@@ -10,9 +10,17 @@ protected:
     std::vector<QVector3D> positions;
     std::vector<QVector3D> normals;
 
+protected:
+    Mesh(Mesh&& mesh)      = default;
+    Mesh(const Mesh& mesh) = default;
+
 public:
+    Mesh(std::vector<QVector3D>&& _positions)
+        : positions{std::move(_positions)}, normals{_positions.size() }
+    {
+    }
     Mesh(const std::vector<QVector3D>& _positions)
-        : positions{_positions}, normals(_positions.size())
+        : positions{_positions}, normals{_positions.size() }
     {
     }
 
@@ -28,10 +36,16 @@ public:
     const QVector3D* Normals()     const { return normals.data();          }
 
     virtual uint VertexCount()     const { return (uint) positions.size(); }
-    virtual Mesh* clone()          const
+    virtual Mesh* Clone()          const
     {
         Mesh* mesh                   = new Mesh(positions);
         mesh->normals                = normals;
+        return mesh;
+    }
+    virtual Mesh* Move()
+    {
+        Mesh* mesh                   = new Mesh(std::move(positions));
+        mesh->normals                = std::move(normals);
         return mesh;
     }
 
@@ -40,12 +54,19 @@ private:
 };
 
 
-class IndexedMesh : public Mesh
+class IndexedMesh final : public Mesh
 {
 private:
     std::vector<uint> indices;
 
 public:
+    IndexedMesh(IndexedMesh&& mesh)      = default;
+    IndexedMesh(const IndexedMesh& mesh) = default;
+
+    IndexedMesh(std::vector<QVector3D>&& _positions, std::vector<uint>&& _indices)
+        : Mesh{std::move(_positions)}, indices{std::move(_indices)}
+    {
+    }
     IndexedMesh(const std::vector<QVector3D>& _positions, const std::vector<uint>& _indices)
         : Mesh{_positions}, indices{_indices}
     {
@@ -56,7 +77,8 @@ public:
      size_t SizeOfIndices()        const { return indices.size() * sizeof(indices[0]);  }
      virtual uint VertexCount()    const { return (uint) indices.size();                }
 
-     IndexedMesh* clone() const override;
+     IndexedMesh* Clone() const override;
+     IndexedMesh* Move()        override;
 
 private:
     void CalculateNormals() override;

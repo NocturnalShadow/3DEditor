@@ -1,31 +1,39 @@
 #include "scene_item.h"
 
-SceneItem::SceneItem(const Model &_model, ShaderProgram *_program)
-    : model{ std::make_shared<Model>(_model) },
+SceneItem::SceneItem(const IModel &_model, ShaderProgram *_program)
+    : model{ _model.Clone() },
       program{ _program }
 {
     model->InitializeModel();
 }
 
-SceneItem::SceneItem(Model &&_model)
-    : model{ std::make_shared<Model>(std::move(_model)) }
+SceneItem::SceneItem(IModel&& _model)
+    : model{ _model.Move() }
 {
     if(!model->isInitialized()) {
         model->InitializeModel();
     }
 }
 
+SceneItem::SceneItem(SceneItem&& item)
+    : model{ item.model->Move() },
+      transformation{ std::move(item.transformation) },
+      program{ std::move(item.program) }
+{
+
+}
+
 SceneItem::SceneItem(const SceneItem &item)
-    : model{ std::make_shared<Model>(*item.model) },
+    : model{ item.model->Clone() },
       transformation{ item.transformation },
       program{ item.program }
 {
     model->InitializeModel();
 }
 
-SceneItem &SceneItem::operator=(const SceneItem &item)
+SceneItem& SceneItem::operator=(const SceneItem &item)
 {
-    model = std::make_shared<Model>(*item.model);
+    model.reset(item.model->Clone());
     transformation = item.transformation;
     program = item.program;
     model->InitializeModel();

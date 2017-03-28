@@ -112,9 +112,9 @@ void Scene::just_a_test()
 
     if(frame == 0)
     {
-        Model model(vertices, colors, indices);
-        auto scene_item = SceneItem(model);
-        AddItem("TheCube", scene_item);
+//        ColoredModel model(vertices, colors, indices);
+//        auto scene_item = SceneItem(model);
+        AddItem("TheCube", SceneItem(ColoredModel(vertices, colors, indices)));
         scene_view->Camera()->MoveTo({0.0f, 0.0f, 8.0f});
     }
 
