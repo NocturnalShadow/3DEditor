@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-CONFIG += c++11
+CONFIG   += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -44,4 +44,6 @@ HEADERS  += display.h           \
     gl_debug.h \
     scene_item.h \
     scene_view.h \
-    scene_model.h
+    scene_model.h \
+    drawable.h \
+    ui_item.h

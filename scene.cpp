@@ -1,9 +1,8 @@
 #include "scene.h"
 #include "scene_item.h"
 #include "camera.h"
-#include "glm/glm.hpp"
-#include "glm/gtx/transform.hpp"
 
+#include <QTimer>
 #include <QVector4D>
 #include <QVector3D>
 
@@ -46,18 +45,32 @@ void Scene::paintGL()
     update();
 }
 
-void Scene::AddItem(const std::string &item_name, const SceneItem &item)
+void Scene::AddItem(uint item_id, const SceneItem& item)
 {
     SceneItem* item_ptr = new SceneItem(item);
+    scene_model->AddItem(item_id, item_ptr);
     scene_view->AddItem(item_ptr);
-    scene_model->AddItem(item_name, item_ptr);
 }
 
-void Scene::AddItem(const std::string &item_name, SceneItem &&item)
+void Scene::AddItem(uint item_id, SceneItem&& item)
 {
     SceneItem* item_ptr = new SceneItem(std::move(item));
+    scene_model->AddItem(item_id, item_ptr);
     scene_view->AddItem(item_ptr);
-    scene_model->AddItem(item_name, item_ptr);
+}
+
+void Scene::AddUserInterfaceItem(uint item_id, const UserInterfaceItem& item)
+{
+    UserInterfaceItem* item_ptr = new UserInterfaceItem(item);
+    scene_model->AddUIItem(item_id, item_ptr);
+    scene_view->AddUserInterfaceItem(item_ptr);
+}
+
+void Scene::AddUserInterfaceItem(uint item_id, UserInterfaceItem&& item)
+{
+    UserInterfaceItem* item_ptr = new UserInterfaceItem(std::move(item));
+    scene_model->AddUIItem(item_id, item_ptr);
+    scene_view->AddUserInterfaceItem(item_ptr);
 }
 
 
@@ -70,7 +83,6 @@ void Scene::AddItem(const std::string &item_name, SceneItem &&item)
 void Scene::just_a_test()
 {
     static uint frame = 0;
-
     std::vector<QVector3D> vertices =
     {
         {-1.0,-1.0,1.0},
@@ -112,13 +124,16 @@ void Scene::just_a_test()
 
     if(frame == 0)
     {
-//        ColoredModel model(vertices, colors, indices);
-//        auto scene_item = SceneItem(model);
-        AddItem("TheCube", SceneItem(ColoredModel(vertices, colors, indices)));
+        ColoredModel model(vertices, colors, indices);
+        AddItem(1, SceneItem(model));
+        auto ui_item = UserInterfaceItem(model);
+        ui_item.Transform().Scale() = QVector3D{0.5f, 0.5f, 0.5f};
+        ui_item.Show();
+        AddUserInterfaceItem(1, ui_item);
         scene_view->Camera()->MoveTo({0.0f, 0.0f, 8.0f});
     }
-
-    //scene_model->Item("TheCube").Transform().Rotation().setY(100.0f * frame / 150);
+      //scene_view->Camera()->Rotate(0, 0.5f);
+//    scene_model->Item("TheCube").Transform().Rotation().setY(100.0f * frame / 150);
 //    scene_model->Item("TheCube").Transform().SetPosition({0.0f, 0.0f + sin(frame / 60.0f)*2.8f, 4.0f});
 //      scene_model->Item("TheCube").Transform().SetPosition({0.0f, 0.0f, 0.0f});
 //    static float angle = 0;
@@ -126,6 +141,7 @@ void Scene::just_a_test()
 //    QMatrix4x4 rotation;
 //    rotation.rotate(angle, QVector3D{0.0f, 1.0f, 0.0f});
 //    scene_view->Camera()->MoveTo(rotation * QVector3D{0.0f, 0.0f, -8.0f});
+
     scene_view->Paint();
 
 //    scene_model->Item("TheCube").Transform().SetPosition({0.0, 2.0, 6.0});

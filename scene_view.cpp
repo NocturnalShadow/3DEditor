@@ -12,10 +12,16 @@ void SceneView::Initialize()
     glFunctions->glClearColor(0.15f, 0.145f, 0.15f, 1.0f);
 }
 
-void SceneView::AddItem(SceneItem *item)
+void SceneView::AddItem(IDrawable* item)
 {
     item->BindShaderProgram(&program);
-    items.push_back(item);
+    scene_items.push_back(item);
+}
+
+void SceneView::AddUserInterfaceItem(IDrawable* item)
+{
+    item->BindShaderProgram(&program);
+    ui_items.push_back(item);
 }
 
 void SceneView::Resize(int width, int height)
@@ -27,7 +33,12 @@ void SceneView::Resize(int width, int height)
 void SceneView::Paint()
 {
     program.Update(*camera);
-    for(auto item : items) {
+    for(auto item : scene_items) {
+        item->Draw(glFunctions);
+    }
+    glFunctions->glClear(GL_DEPTH_BUFFER_BIT);
+    for(auto item : ui_items) {
         item->Draw(glFunctions);
     }
 }
+

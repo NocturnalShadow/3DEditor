@@ -1,10 +1,8 @@
 #pragma once
 
-#include "glm/glm.hpp"
-#include "glm/gtx/transform.hpp"
-
 #include <QVector3D>
 #include <QMatrix4x4>
+#include <QQuaternion>
 
 class ICamera
 {
@@ -99,21 +97,26 @@ public:
 };
 
 
-
 class SceneViewCamera : public ICamera
 {
 private:
     QVector3D center    = { 0.0f, 0.0f, 0.0f };
     QVector3D up        = { 0.0f, 1.0f, 0.0f };
+    QVector3D right     = { 1.0f, 0.0f, 0.0f };
 
-    QMatrix4x4 centered_rotation;
+    QQuaternion centered_rotation;
+
+    float xRot = 0;
+    float yRot = 0;
+
+    bool xReverse    = false;
 
 public:
     SceneViewCamera(QVector3D _position = {3.0f, 3.0f, -3.0f}, float _fov = 45.0f, float _aspect = 4.0f/3.0f)
          : ICamera{ _position, _fov, _aspect }
     {
         view.lookAt(position, center, up);
-        centered_rotation.setToIdentity();
+        centered_rotation = QQuaternion();
     }
 
 public:
@@ -121,33 +124,55 @@ public:
     {
         position = _position;
         view.setToIdentity();
-        centered_rotation.setToIdentity();
+        centered_rotation = QQuaternion();
         view.lookAt(position, center, up);
     }
     void LookAt(const QVector3D& _center)
     {
         center = _center;
         view.setToIdentity();
+        centered_rotation = QQuaternion();
         view.lookAt(centered_rotation * position, center, up);
     }
 
    void Rotate(float deg_xRot, float deg_yRot)
    {
-        centered_rotation.rotate(deg_xRot, up);
-        centered_rotation.rotate(deg_yRot, QVector3D::crossProduct(center - position, up));
-        view.setToIdentity();
-        view.lookAt(centered_rotation * position, center, {0.0f, 1.0f, 0.0f});
+       view.setToIdentity();
+       if(!xReverse) {
+           xRot += deg_xRot;
+       } else {
+           xRot -= deg_xRot;
+       }
+       yRot += deg_yRot;
+       centered_rotation = QQuaternion::fromAxisAndAngle(up, xRot) * QQuaternion::fromAxisAndAngle(right, yRot);
+       view.lookAt(centered_rotation * position, center, centered_rotation * up);
    }
 
    void Rotate(QPoint p) {
-        Rotate((float) -p.rx() / 3.0f, (float) -p.ry() / 3.0f);
+        Rotate((float) -p.rx() / 2.3f, (float) -p.ry() / 2.3f);
    }
 
    void Zoom(float units)
    {
         position += (center - position) * units;
         view.setToIdentity();
-        view.lookAt(centered_rotation * position, center, {0.0f, 1.0f, 0.0f});
+        view.lookAt(centered_rotation * position, center, up);
+   }
+
+   void Reset()
+   {
+       centered_rotation = QQuaternion();
+       view.setToIdentity();
+       view.lookAt(centered_rotation*position, center, up);
+       xRot = yRot = 0;
+   }
+
+   void ReverseIfNeeded()
+   {
+       if((centered_rotation * up).y() > 0 && xReverse)
+           xReverse = false;
+       if((centered_rotation * up).y() < 0 && !xReverse)
+           xReverse = true;
    }
 };
 

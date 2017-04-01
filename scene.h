@@ -6,6 +6,7 @@
 #include "shader_program.h"
 #include "model.h"
 
+#include "ui_item.h"
 #include "scene_model.h"
 #include "scene_view.h"
 #include "scene_item.h"
@@ -26,6 +27,9 @@ private:
     std::unique_ptr<SceneModel> scene_model = nullptr;
     std::unique_ptr<SceneView>  scene_view  = nullptr;
 
+    QPoint prev_mouse_pos;
+    QPoint mouse_pos_delta;
+
 public:
     Scene(QWidget *parent = nullptr);
     ~Scene() = default;
@@ -36,22 +40,37 @@ protected:
     void paintGL() override;
 
 public:
-    void AddItem(const std::string& item_name, const SceneItem& item);
-    void AddItem(const std::string& item_name, SceneItem&& item);
+    void AddItem(uint item_id, const SceneItem& item);
+    void AddItem(uint item_id, SceneItem&& item);
+
+    void AddUserInterfaceItem(uint item_id, const UserInterfaceItem& item);
+    void AddUserInterfaceItem(uint item_id, UserInterfaceItem&& item);
 
     void just_a_test();
 
 public:
+    void mousePressEvent(QMouseEvent* event) {
+        prev_mouse_pos = event->pos();
+        scene_view->Camera()->ReverseIfNeeded();
+    }
+
     void mouseMoveEvent(QMouseEvent* event)
     {
-       static QPoint prev_pos = event->pos();
-       QPoint delta = event->pos() - prev_pos;
+       mouse_pos_delta = event->pos() - prev_mouse_pos;
+       prev_mouse_pos = event->pos();
        if(event->buttons() == Qt::MidButton)
        {
-           scene_view->Camera()->Rotate(delta);
-           prev_pos = event->pos();
+           scene_view->Camera()->Rotate(mouse_pos_delta);
+           prev_mouse_pos = event->pos();
        }
     }
+    void keyPressEvent(QKeyEvent* event)
+    {
+        if(event->key() == Qt::Key_R) {
+             scene_view->Camera()->Reset();
+        }
+    }
+
     void wheelEvent(QWheelEvent* event)
     {
         float delta = event->delta() / 600.0f;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "model.h"
+#include "drawable.h"
 #include "transform.h"
 #include "shader_program.h"
 
@@ -10,7 +11,7 @@
 #include <QOpenGLFunctions_4_3_Core>
 
 
-class SceneItem
+class SceneItem : public IDrawable
 {
 private:
     std::unique_ptr<IModel> model;
@@ -29,9 +30,9 @@ public:
 public:
     Transformation& Transform() { return transformation; }
 
-    void BindShaderProgram(ShaderProgram* _program);
+    void BindShaderProgram(ShaderProgram* _program) override;
 
-    void Draw(QOpenGLFunctions* view);
-    void Draw(QOpenGLFunctions_4_3_Core* view);
+    void Draw(QOpenGLFunctions* view) override;
+    void Draw(QOpenGLFunctions_4_3_Core* view) override;
 };
 

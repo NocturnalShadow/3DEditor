@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui_item.h"
 #include "scene_item.h"
 
 #include <map>
@@ -10,21 +11,28 @@
 class SceneModel
 {
 private:
-        std::map<std::string, std::unique_ptr<SceneItem>> items;
+        std::map<uint, std::unique_ptr<UserInterfaceItem>> ui_items;
+        std::map<uint, std::unique_ptr<SceneItem>> scene_items;
 
 public:
     SceneModel() = default;
 
 public:
-    void AddItem(std::string item_name, SceneItem* item) {
-        items[item_name] = std::unique_ptr<SceneItem>(item);
+    void AddItem(uint item_id, SceneItem* item) {
+        scene_items[item_id] = std::unique_ptr<SceneItem>(item);
     }
-    void AddItem(const std::string& item_name, SceneItem&& item) {
-       items[item_name] = std::make_unique<SceneItem>(std::move(item));
+    void AddItem(uint item_id, SceneItem&& item) {
+       scene_items[item_id] = std::make_unique<SceneItem>(std::move(item));
+    }
+    void AddUIItem(uint item_id, UserInterfaceItem* item) {
+        ui_items[item_id] = std::unique_ptr<UserInterfaceItem>(item);
+    }
+    void AddUIItem(uint item_id, UserInterfaceItem&& item) {
+       ui_items[item_id] = std::make_unique<UserInterfaceItem>(std::move(item));
     }
 
-    SceneItem& Item(const std::string item_name) {
-        return *items.at(item_name);
+    SceneItem& Item(uint item_id) {
+        return *scene_items.at(item_id);
     }
 };
 

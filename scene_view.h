@@ -19,7 +19,8 @@ private:
     std::unique_ptr<SceneViewCamera> camera;
     QOpenGLFunctions_4_3_Core* glFunctions;
 
-    std::vector<SceneItem*> items;
+    std::vector<IDrawable*> scene_items;
+    std::vector<IDrawable*> ui_items;
 
 public:
     SceneView(QOpenGLFunctions_4_3_Core* _glFunctions, QString program_name)
@@ -30,13 +31,15 @@ public:
 public:
     void Initialize();
     void Paint();
-    void AddItem(SceneItem* item);
+    void AddItem(IDrawable* item);
+    void AddUserInterfaceItem(IDrawable* item);
     void Resize(int width, int height);
-    SceneViewCamera* Camera() {
-        return camera.get();
-    }
     void BindShader() {
         program.Bind();
+    }
+
+    SceneViewCamera* Camera() {
+        return camera.get();
     }
 };
 
