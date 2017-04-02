@@ -13,7 +13,7 @@ Scene::Scene(QWidget* parent)
     QSurfaceFormat format;
     format.setVersion(4, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
-    format.setSamples(16);
+    format.setSamples(8);
     setFormat(format);
 
     setMinimumSize(1366,768);
@@ -25,6 +25,7 @@ void Scene::initializeGL()
 
     scene_view.reset(new SceneView(this, "basicShader"));
     scene_model.reset(new SceneModel());
+    input_manager.reset(new InputManager(this, context()));
 
     qDebug((char*)glGetString(GL_VERSION));
     qDebug() << format().version();
@@ -36,18 +37,24 @@ void Scene::initializeGL()
 void Scene::resizeGL(int width, int height)
 {
     scene_view->Resize(width, height);
+    input_manager->Resize(width, height);
 }
 
 void Scene::paintGL()
 {
-    scene_view->BindShader();
     just_a_test();
+
+    scene_view->BindShader();
+    scene_view->Paint();
+    input_manager->Update();
+
     update();
 }
 
 void Scene::AddItem(uint item_id, const SceneItem& item)
 {
     SceneItem* item_ptr = new SceneItem(item);
+    item_ptr->SetId(item_id);
     scene_model->AddItem(item_id, item_ptr);
     scene_view->AddItem(item_ptr);
 }
@@ -55,6 +62,7 @@ void Scene::AddItem(uint item_id, const SceneItem& item)
 void Scene::AddItem(uint item_id, SceneItem&& item)
 {
     SceneItem* item_ptr = new SceneItem(std::move(item));
+    item_ptr->SetId(item_id);
     scene_model->AddItem(item_id, item_ptr);
     scene_view->AddItem(item_ptr);
 }
@@ -129,7 +137,7 @@ void Scene::just_a_test()
         auto ui_item = UserInterfaceItem(model);
         ui_item.Transform().Scale() = QVector3D{0.5f, 0.5f, 0.5f};
         ui_item.Show();
-        AddUserInterfaceItem(1, ui_item);
+        AddUserInterfaceItem(2, ui_item);
         scene_view->Camera()->MoveTo({0.0f, 0.0f, 8.0f});
     }
       //scene_view->Camera()->Rotate(0, 0.5f);
@@ -141,8 +149,6 @@ void Scene::just_a_test()
 //    QMatrix4x4 rotation;
 //    rotation.rotate(angle, QVector3D{0.0f, 1.0f, 0.0f});
 //    scene_view->Camera()->MoveTo(rotation * QVector3D{0.0f, 0.0f, -8.0f});
-
-    scene_view->Paint();
 
 //    scene_model->Item("TheCube").Transform().SetPosition({0.0, 2.0, 6.0});
 //    scene_view->Paint();

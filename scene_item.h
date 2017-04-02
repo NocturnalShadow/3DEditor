@@ -14,6 +14,7 @@
 class SceneItem : public IDrawable
 {
 private:
+    uint id = 0;
     std::unique_ptr<IModel> model;
     Transformation transformation;
     ShaderProgram* program;
@@ -28,11 +29,25 @@ public:
     SceneItem& operator=(const SceneItem& item);
 
 public:
-    Transformation& Transform() { return transformation; }
+    uint Id() const {
+        return id;
+    }
+    bool SetId(uint _id)
+    {
+        if(id) {
+            return false;
+        } else {
+            id = _id;
+        }
+        return true;
+    }
+    Transformation& Transform() {
+        return transformation;
+    }
 
     void BindShaderProgram(ShaderProgram* _program) override;
 
-    void Draw(QOpenGLFunctions* view) override;
-    void Draw(QOpenGLFunctions_4_3_Core* view) override;
+    void Draw(QOpenGLFunctions* glFunctions) override;
+    void Draw(QOpenGLFunctions_4_3_Core* glFunctions) override;
 };
 

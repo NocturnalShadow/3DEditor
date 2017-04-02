@@ -3,7 +3,7 @@
 
 #include <QDebug>
 
-void _check_gl_error(const char *file, int line, QOpenGLFunctions* funcs, const char* msg) {
+void _check_gl_error(const char *file, int line, QOpenGLFunctions_4_3_Core* funcs, const char* msg) {
         GLenum err (funcs->glGetError());
         qDebug() << msg;
         if(err!=GL_NO_ERROR) {

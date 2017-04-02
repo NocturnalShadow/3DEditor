@@ -37,6 +37,7 @@ SceneItem& SceneItem::operator=(const SceneItem &item)
     transformation = item.transformation;
     program = item.program;
     model->InitializeModel();
+
     return *this;
 }
 
@@ -46,14 +47,22 @@ void SceneItem::BindShaderProgram(ShaderProgram *_program)
     model->BindShaderProgram(program->Get());
 }
 
-void SceneItem::Draw(QOpenGLFunctions *view)
+void SceneItem::Draw(QOpenGLFunctions* glFunctions)
 {
+    glFunctions->glEnable(GL_STENCIL_TEST);
+    glFunctions->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glFunctions->glStencilFunc(GL_ALWAYS, id, -1);
+
     program->Update(transformation);
-    model->Draw(view);
+    model->Draw(glFunctions);
 }
 
-void SceneItem::Draw(QOpenGLFunctions_4_3_Core *view)
+void SceneItem::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
 {
+    glFunctions->glEnable(GL_STENCIL_TEST);
+    glFunctions->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glFunctions->glStencilFunc(GL_ALWAYS, id, -1);
+
     program->Update(transformation);
-    model->Draw(view);
+    model->Draw(glFunctions);
 }

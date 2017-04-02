@@ -46,4 +46,5 @@ HEADERS  += display.h           \
     scene_view.h \
     scene_model.h \
     drawable.h \
-    ui_item.h
+    ui_item.h \
+    input_manager.h
