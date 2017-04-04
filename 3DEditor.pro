@@ -32,7 +32,10 @@ SOURCES +=  main.cpp            \
     model.cpp \
     gl_debug.cpp \
     scene_view.cpp \
-    scene_item.cpp
+    scene_item.cpp \
+    ui_item.cpp \
+    entity.cpp \
+    input_manager.cpp
 
 HEADERS  += display.h           \
             scene.h             \
@@ -47,4 +50,5 @@ HEADERS  += display.h           \
     scene_model.h \
     drawable.h \
     ui_item.h \
-    input_manager.h
+    input_manager.h \
+    entity.h

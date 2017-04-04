@@ -11,6 +11,7 @@
 #include "scene_item.h"
 #include "scene_model.h"
 
+#include "entity.h"
 #include "input_manager.h"
 
 #include <memory>
@@ -29,6 +30,7 @@ private:
     std::unique_ptr<SceneModel>     scene_model     = nullptr;
     std::unique_ptr<SceneView>      scene_view      = nullptr;
     std::unique_ptr<InputManager>   input_manager   = nullptr;
+    std::unique_ptr<EntityManager>  entity_manager  = nullptr;
 
     QPoint prev_mouse_pos;
     QPoint mouse_pos_delta;
@@ -43,11 +45,11 @@ protected:
     void paintGL() override;
 
 public:
-    void AddItem(uint item_id, const SceneItem& item);
-    void AddItem(uint item_id, SceneItem&& item);
+    void AddItem(const SceneItem& item);
+    void AddItem(SceneItem&& item);
 
-    void AddUserInterfaceItem(uint item_id, const UserInterfaceItem& item);
-    void AddUserInterfaceItem(uint item_id, UserInterfaceItem&& item);
+    void AddUserInterfaceItem(const UserInterfaceItem& item);
+    void AddUserInterfaceItem(UserInterfaceItem&& item);
 
     void just_a_test();
 

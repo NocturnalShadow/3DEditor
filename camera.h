@@ -79,7 +79,7 @@ public:
         view.lookAt(position, position + forward, up);
     }
 
-    void ResetPosition()
+    void Reset()
     {
         position  = { 0.0f, 0.0f, 0.0f };
         forward   = { 0.0f, 0.0f, 1.0f };

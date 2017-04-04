@@ -14,6 +14,7 @@ Scene::Scene(QWidget* parent)
     format.setVersion(4, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
     format.setSamples(8);
+    format.setStencilBufferSize(16);
     setFormat(format);
 
     setMinimumSize(1366,768);
@@ -26,6 +27,7 @@ void Scene::initializeGL()
     scene_view.reset(new SceneView(this, "basicShader"));
     scene_model.reset(new SceneModel());
     input_manager.reset(new InputManager(this, context()));
+    entity_manager.reset(new EntityManager());
 
     qDebug((char*)glGetString(GL_VERSION));
     qDebug() << format().version();
@@ -51,33 +53,39 @@ void Scene::paintGL()
     update();
 }
 
-void Scene::AddItem(uint item_id, const SceneItem& item)
+void Scene::AddItem(const SceneItem& item)
 {
     SceneItem* item_ptr = new SceneItem(item);
-    item_ptr->SetId(item_id);
-    scene_model->AddItem(item_id, item_ptr);
+
+    entity_manager->AddItem(item_ptr);
+    scene_model->AddItem(item_ptr);
     scene_view->AddItem(item_ptr);
 }
 
-void Scene::AddItem(uint item_id, SceneItem&& item)
+void Scene::AddItem(SceneItem&& item)
 {
     SceneItem* item_ptr = new SceneItem(std::move(item));
-    item_ptr->SetId(item_id);
-    scene_model->AddItem(item_id, item_ptr);
+
+    entity_manager->AddItem(item_ptr);
+    scene_model->AddItem(item_ptr);
     scene_view->AddItem(item_ptr);
 }
 
-void Scene::AddUserInterfaceItem(uint item_id, const UserInterfaceItem& item)
+void Scene::AddUserInterfaceItem(const UserInterfaceItem& item)
 {
     UserInterfaceItem* item_ptr = new UserInterfaceItem(item);
-    scene_model->AddUIItem(item_id, item_ptr);
+
+    entity_manager->AddItem(item_ptr);
+    scene_model->AddUIItem(item_ptr);
     scene_view->AddUserInterfaceItem(item_ptr);
 }
 
-void Scene::AddUserInterfaceItem(uint item_id, UserInterfaceItem&& item)
+void Scene::AddUserInterfaceItem(UserInterfaceItem&& item)
 {
     UserInterfaceItem* item_ptr = new UserInterfaceItem(std::move(item));
-    scene_model->AddUIItem(item_id, item_ptr);
+
+    entity_manager->AddItem(item_ptr);
+    scene_model->AddUIItem(item_ptr);
     scene_view->AddUserInterfaceItem(item_ptr);
 }
 
@@ -133,11 +141,17 @@ void Scene::just_a_test()
     if(frame == 0)
     {
         ColoredModel model(vertices, colors, indices);
-        AddItem(1, SceneItem(model));
+        auto si = SceneItem(model);
+        AddItem(si);
+        AddItem(si);
+        auto item = dynamic_cast<SceneItem*>(entity_manager->Item(2));
+        item->Transform().Position().setY(2.0f);
         auto ui_item = UserInterfaceItem(model);
         ui_item.Transform().Scale() = QVector3D{0.5f, 0.5f, 0.5f};
         ui_item.Show();
-        AddUserInterfaceItem(2, ui_item);
+        AddUserInterfaceItem(ui_item);
+        auto item2 = dynamic_cast<UserInterfaceItem*>(entity_manager->Item(3));
+        item2->Transform().SetRotation({0.0f, 45.0f, 0.0f});
         scene_view->Camera()->MoveTo({0.0f, 0.0f, 8.0f});
     }
       //scene_view->Camera()->Rotate(0, 0.5f);

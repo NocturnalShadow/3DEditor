@@ -16,15 +16,15 @@ class SceneView
 {
 private:
     ShaderProgram program;
-    std::unique_ptr<SceneViewCamera> camera;
     QOpenGLFunctions_4_3_Core* glFunctions;
+    std::unique_ptr<SceneViewCamera> camera;
 
     std::vector<IDrawable*> scene_items;
     std::vector<IDrawable*> ui_items;
 
 public:
     SceneView(QOpenGLFunctions_4_3_Core* _glFunctions, QString program_name)
-        : glFunctions{ _glFunctions }, program{ program_name }, camera{new SceneViewCamera()}
+        : glFunctions{ _glFunctions }, program{ program_name }, camera{ new SceneViewCamera() }
     {
     }
 

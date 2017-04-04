@@ -1,8 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <QVector3D>
+
 #include <QDebug>
+#include <QVector3D>
 
 class Mesh
 {

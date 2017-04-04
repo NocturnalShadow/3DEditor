@@ -1,11 +1,11 @@
 #pragma once
 
-#include "transform.h"
 #include "camera.h"
+#include "transform.h"
 
+#include <QColor>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
-#include <QColor>
 
 class ShaderProgram
 {

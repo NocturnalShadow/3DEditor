@@ -33,7 +33,7 @@ void SceneView::Resize(int width, int height)
 
 void SceneView::Paint()
 {
-    glFunctions->glClearStencil(7);
+    glFunctions->glClearStencil(0);
     glFunctions->glClear(GL_STENCIL_BUFFER_BIT);
 
     program.Update(*camera);

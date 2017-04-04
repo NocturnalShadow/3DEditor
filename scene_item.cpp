@@ -1,14 +1,14 @@
 #include "scene_item.h"
 
 SceneItem::SceneItem(const IModel &_model, ShaderProgram *_program)
-    : model{ _model.Clone() },
-      program{ _program }
+    : model     { _model.Clone() },
+      program   { _program       }
 {
     model->InitializeModel();
 }
 
 SceneItem::SceneItem(IModel&& _model)
-    : model{ _model.Move() }
+    : model     { _model.Move() }
 {
     if(!model->isInitialized()) {
         model->InitializeModel();
@@ -16,17 +16,18 @@ SceneItem::SceneItem(IModel&& _model)
 }
 
 SceneItem::SceneItem(SceneItem&& item)
-    : model{ item.model->Move() },
-      transformation{ std::move(item.transformation) },
-      program{ std::move(item.program) }
+    : model             { item.model->Move()             },
+      transformation    { std::move(item.transformation) },
+      program           { std::move(item.program)        },
+      IEntity           { std::move(item) }
 {
-
 }
 
 SceneItem::SceneItem(const SceneItem &item)
-    : model{ item.model->Clone() },
-      transformation{ item.transformation },
-      program{ item.program }
+    : model             { item.model->Clone() },
+      transformation    { item.transformation },
+      program           { item.program        },
+      IEntity           { item }
 {
     model->InitializeModel();
 }
@@ -34,9 +35,10 @@ SceneItem::SceneItem(const SceneItem &item)
 SceneItem& SceneItem::operator=(const SceneItem &item)
 {
     model.reset(item.model->Clone());
-    transformation = item.transformation;
-    program = item.program;
     model->InitializeModel();
+
+    transformation  = item.transformation;
+    program         = item.program;
 
     return *this;
 }
@@ -51,18 +53,22 @@ void SceneItem::Draw(QOpenGLFunctions* glFunctions)
 {
     glFunctions->glEnable(GL_STENCIL_TEST);
     glFunctions->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glFunctions->glStencilFunc(GL_ALWAYS, id, -1);
+    glFunctions->glStencilFunc(GL_ALWAYS, Id(), -1);
 
     program->Update(transformation);
     model->Draw(glFunctions);
+
+    glFunctions->glDisable(GL_STENCIL_TEST);
 }
 
 void SceneItem::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
 {
     glFunctions->glEnable(GL_STENCIL_TEST);
     glFunctions->glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glFunctions->glStencilFunc(GL_ALWAYS, id, -1);
+    glFunctions->glStencilFunc(GL_ALWAYS, Id(), -1);
 
     program->Update(transformation);
     model->Draw(glFunctions);
+
+    glFunctions->glDisable(GL_STENCIL_TEST);
 }
