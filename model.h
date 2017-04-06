@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
@@ -69,13 +70,22 @@ protected:
     ColoredModel(const ColoredModel& model) = default;
 
 public:
-    ColoredModel(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors)
+    ColoredModel(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors = std::vector<QVector4D>{})
         : IModel{ positions }, colors{ colors }
     {
     }
     ColoredModel(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors, const std::vector<uint>& indices)
         : IModel{ positions, indices }, colors{ colors }
     {
+    }
+    ColoredModel(const std::vector<QVector3D>& positions, const std::vector<uint>& indices)
+        : IModel{ positions, indices }
+    {
+    }
+    ColoredModel(const std::vector<QVector3D>& positions, const std::vector<uint>& indices, const QVector4D& color)
+        : IModel{ positions, indices }
+    {
+       SetColor(color);
     }
 
 public:
@@ -118,5 +128,17 @@ public:
         vertexArrayObject->release();
     }
 
+    void SetColor(const QVector4D& color)
+    {
+        colors = std::vector<QVector4D>(mesh->VertexCount(), color);
+        if(is_initialized)
+        {
+            vertexArrayObject->bind();
+            vertexBufferObjects[3].bind();
+            vertexBufferObjects[3].allocate(colors.data(), (int)colors.size() * sizeof(colors[0]));
+            vertexBufferObjects[3].setUsagePattern(QOpenGLBuffer::StreamDraw);
+            vertexArrayObject->release();
+        }
+    }
 };
 

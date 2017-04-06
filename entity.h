@@ -38,7 +38,7 @@ public:
     EntityManager() = default;
 
 public:
-    void AddItem(IEntity* item);
-    void ReplaceItem(IEntity* item, IEntity* with);
+    uint AddItem(IEntity* item);
+    uint ReplaceItem(IEntity* item, IEntity* with);
     IEntity* Item(uint item_id);
 };

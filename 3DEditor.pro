@@ -51,4 +51,5 @@ HEADERS  += display.h           \
     drawable.h \
     ui_item.h \
     input_manager.h \
-    entity.h
+    entity.h \
+    mathematics.h

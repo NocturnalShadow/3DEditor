@@ -15,7 +15,7 @@ IEntity::IEntity(IEntity&& entity)
     }
 }
 
-void EntityManager::AddItem(IEntity* item)
+uint EntityManager::AddItem(IEntity* item)
 {
     if((item->id == 0) && (entities.count(item->id) == 0))
     {
@@ -24,9 +24,10 @@ void EntityManager::AddItem(IEntity* item)
         entities[unused_id] = item;
         ++unused_id;
     }
+    return item->id;
 }
 
-void EntityManager::ReplaceItem(IEntity* item, IEntity* with)
+uint EntityManager::ReplaceItem(IEntity* item, IEntity* with)
 {
     if(item->id != 0 && with->id == 0)
     {
@@ -35,6 +36,7 @@ void EntityManager::ReplaceItem(IEntity* item, IEntity* with)
         with->id = item->id;
         item->id = 0;
     }
+    return with->id;
 }
 
 IEntity* EntityManager::Item(uint item_id)
