@@ -39,8 +39,8 @@ public:
     virtual void BindShaderProgram(QOpenGLShaderProgram& program);
 
     virtual void InitializeModel();
-    virtual void Draw(QOpenGLFunctions* context);
-    virtual void Draw(QOpenGLFunctions_4_3_Core* context);
+    virtual void Draw(QOpenGLFunctions* context, GLenum primitive = GL_TRIANGLES);
+    virtual void Draw(QOpenGLFunctions_4_3_Core* context, GLenum primitive = GL_TRIANGLES);
 
     virtual IModel* Clone() const = 0;
     virtual IModel* Move()        = 0;
@@ -51,8 +51,8 @@ protected:
     void InitializeBaseModel();
     void BindBaseShaderProgram(QOpenGLShaderProgram& program);
 
-    void DrawBase(QOpenGLFunctions* glFunctions);
-    void DrawBase(QOpenGLFunctions_4_3_Core* glFunctions);
+    void DrawBase(QOpenGLFunctions* glFunctions, GLenum primitive);
+    void DrawBase(QOpenGLFunctions_4_3_Core* glFunctions, GLenum primitive);
 
 private:
     void GenerateObjects();
@@ -73,6 +73,11 @@ public:
     ColoredModel(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors = std::vector<QVector4D>{})
         : IModel{ positions }, colors{ colors }
     {
+    }
+    ColoredModel(const std::vector<QVector3D>& positions, const QVector4D& color)
+        : IModel{ positions }
+    {
+       SetColor(color);
     }
     ColoredModel(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors, const std::vector<uint>& indices)
         : IModel{ positions, indices }, colors{ colors }
@@ -107,13 +112,19 @@ public:
 
         is_initialized = true;
     }
-    virtual void Draw(QOpenGLFunctions* context) override
+    virtual void Draw(QOpenGLFunctions* glFunctions, GLenum primitive = GL_TRIANGLES) override
     {
-        DrawBase(context);
+        glFunctions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glFunctions->glEnable(GL_BLEND);
+
+        DrawBase(glFunctions, primitive);
     }
-    virtual void Draw(QOpenGLFunctions_4_3_Core* context) override
+    virtual void Draw(QOpenGLFunctions_4_3_Core* glFunctions, GLenum primitive = GL_TRIANGLES) override
     {
-        DrawBase(context);
+        glFunctions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glFunctions->glEnable(GL_BLEND);
+
+        DrawBase(glFunctions, primitive);
     }
     virtual void BindShaderProgram(QOpenGLShaderProgram& program) override
     {

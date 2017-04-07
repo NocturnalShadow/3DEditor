@@ -56,7 +56,7 @@ void SceneItem::Draw(QOpenGLFunctions* glFunctions)
     glFunctions->glStencilFunc(GL_ALWAYS, Id(), -1);
 
     program->Update(transformation);
-    model->Draw(glFunctions);
+    model->Draw(glFunctions, primitive);
 
     glFunctions->glDisable(GL_STENCIL_TEST);
 }
@@ -68,7 +68,7 @@ void SceneItem::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
     glFunctions->glStencilFunc(GL_ALWAYS, Id(), -1);
 
     program->Update(transformation);
-    model->Draw(glFunctions);
+    model->Draw(glFunctions, primitive);
 
     glFunctions->glDisable(GL_STENCIL_TEST);
 }

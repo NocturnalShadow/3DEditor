@@ -15,9 +15,9 @@
 class SceneItem : public IDrawable, public IEntity
 {
 private:
-    std::unique_ptr<IModel> model;
+    std::unique_ptr<IModel> model   = nullptr;
     Transformation transformation;
-    ShaderProgram* program;
+    ShaderProgram* program          = nullptr;
 
 public:
     SceneItem() = default;
@@ -32,13 +32,13 @@ public:
     SceneItem& operator=(const SceneItem& item);
 
 public:
-    Transformation& Transform() {
-        return transformation;
-    }
-
     void BindShaderProgram(ShaderProgram* _program) override;
 
     void Draw(QOpenGLFunctions* glFunctions) override;
     void Draw(QOpenGLFunctions_4_3_Core* glFunctions) override;
+
+    Transformation& Transform() {
+        return transformation;
+    }
 };
 

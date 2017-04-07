@@ -60,8 +60,12 @@ void UserInterfaceItem::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
 
     if(isVisible)
     {
-        program->Update(transformation);
-        model->Draw(glFunctions);
+        QMatrix4x4 matrix;
+        if(location != nullptr) {
+            matrix.translate(*location);
+        }
+        program->Update(matrix * transformation.Model());
+        model->Draw(glFunctions, primitive);
     }
 
      glFunctions->glDisable(GL_STENCIL_TEST);
@@ -75,9 +79,23 @@ void UserInterfaceItem::Draw(QOpenGLFunctions* glFunctions)
 
     if(isVisible)
     {
-        program->Update(transformation);
-        model->Draw(glFunctions);
+        QMatrix4x4 matrix;
+        if(location != nullptr) {
+            matrix.translate(*location);
+        }
+        program->Update(matrix * transformation.Model());
+        model->Draw(glFunctions, primitive);
     }
 
-     glFunctions->glDisable(GL_STENCIL_TEST);
+    glFunctions->glDisable(GL_STENCIL_TEST);
+}
+
+void UserInterfaceItem::BindLocation(const QVector3D& _location)
+{
+    location = &_location;
+}
+
+void UserInterfaceItem::ReleaseLocation()
+{
+    location = nullptr;
 }

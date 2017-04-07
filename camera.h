@@ -23,9 +23,6 @@ public:
     }
 
 public:
-    virtual void MoveTo(const QVector3D& _position) = 0;
-
-public:
     QMatrix4x4 View()            const      { return view;               }
     QMatrix4x4 Projection()      const      { return projection;         }
     QMatrix4x4 ViewProjection()  const      { return projection * view;  }
@@ -43,7 +40,6 @@ public:
         projection.setToIdentity();
         projection.perspective(fov, aspect, 0.1f, 100.f);
     }
-
 };
 
 class FirstPersonCamera : public ICamera
@@ -60,7 +56,7 @@ public:
     }
 
 public:
-    void MoveTo(const QVector3D& _position) override
+    void MoveTo(const QVector3D& _position)
     {
         position = _position;
         view.setToIdentity();
@@ -112,26 +108,18 @@ private:
     bool xReverse    = false;
 
 public:
-    SceneViewCamera(QVector3D _position = {3.0f, 3.0f, -3.0f}, float _fov = 45.0f, float _aspect = 4.0f/3.0f)
-         : ICamera{ _position, _fov, _aspect }
+    SceneViewCamera(float radius = 9.0f, float _xRot = 45.0f, float _yRot = -45.0f, float _fov = 45.0f, float _aspect = 4.0f/3.0f)
+         : ICamera{ QVector3D{ 0.0f, 0.0f, radius }, _fov, _aspect }, xRot{_xRot}, yRot{_yRot}
     {
-        view.lookAt(position, center, up);
-        centered_rotation = QQuaternion();
+        centered_rotation = QQuaternion::fromAxisAndAngle(up, xRot) * QQuaternion::fromAxisAndAngle(right, yRot);
+        view.lookAt(centered_rotation * position, center, up);
     }
 
 public:
-    void MoveTo(const QVector3D& _position) override
+    void SetRadius(float radius)
     {
-        position = _position;
+        position = QVector3D{ 0.0f, 0.0f, radius};
         view.setToIdentity();
-        centered_rotation = QQuaternion();
-        view.lookAt(position, center, up);
-    }
-    void LookAt(const QVector3D& _center)
-    {
-        center = _center;
-        view.setToIdentity();
-        centered_rotation = QQuaternion();
         view.lookAt(centered_rotation * position, center, up);
     }
 

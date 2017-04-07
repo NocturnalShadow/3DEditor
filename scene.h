@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include <QPainter>
 #include <QVector2D>
 #include <QVector3D>
 #include <QMouseEvent>
@@ -28,20 +29,8 @@
 
 class Scene : public QOpenGLWidget, public QOpenGLFunctions_4_3_Core
 {
-    enum class UI
-    {
-        CENTER,
-        X_AXIS,
-        Y_AXIS,
-        Z_AXIS,
-    };
-    enum class Mode
-    {
-        MOVE,
-        ROTATE,
-        SCALE
-    };
-
+    enum class UI   { CENTER, X_AXIS, Y_AXIS, Z_AXIS };
+    enum class Mode { MOVE, ROTATE, SCALE };
 private:
     std::unique_ptr<SceneModel>     scene_model     = nullptr;
     std::unique_ptr<SceneView>      scene_view      = nullptr;
@@ -52,6 +41,8 @@ private:
 
     QPoint prev_mouse_pos;
     QPoint mouse_pos_delta;
+
+    float sensitivity                               = 1;
 
     SceneItem* selected_item                        = nullptr;
 
@@ -71,14 +62,18 @@ public:
     uint AddItem(const SceneItem& item);
     uint AddItem(SceneItem&& item);
 
+    void ResizeGrid(int size);
+    SceneViewCamera* Camera();
+    SceneItem* Item(uint id);
+
+private:
     uint AddUserInterfaceItem(const UserInterfaceItem& item);
     uint AddUserInterfaceItem(UserInterfaceItem&& item);
 
     void GenerateUI();
     void BindUI();
     void ReleaseUI();
-
-    void just_a_test();
+    void GenerateGrid(int size);
 
 public:
     void mousePressEvent(QMouseEvent* event);

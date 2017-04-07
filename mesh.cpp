@@ -10,7 +10,9 @@ uint qHash(const QVector3D &v)
 void Mesh::CalculateNormals()
 {
     if(positions.size() < 2) return;
-
+    if(positions.size() % 3 != 0) {
+        return;
+    }
     QHash<QVector3D, std::vector<uint>> positions_map;
     for(uint i = 0; i < positions.size(); ++i) {
         positions_map[positions[i]].push_back(i);

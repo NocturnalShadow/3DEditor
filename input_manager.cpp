@@ -20,7 +20,7 @@ uint InputManager::ItemID(QPoint position)
     glFunctions->glReadPixels(position.rx(), height - position.ry() - 1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &index);
 
     QOpenGLFramebufferObject::bindDefault();
-    qDebug() << index;
+
     return index;
 }
 

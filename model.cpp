@@ -56,15 +56,15 @@ void IModel::InitializeModel()
     is_initialized = true;
 }
 
-void IModel::DrawBase(QOpenGLFunctions_4_3_Core* glFunctions)
+void IModel::DrawBase(QOpenGLFunctions_4_3_Core* glFunctions, GLenum primitive)
 {
     vertexArrayObject->bind();
 
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get())) {
-        glFunctions->glDrawElements(GL_TRIANGLES, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
+        glFunctions->glDrawElements(primitive, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
     }
     else {
-        glFunctions->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
+        glFunctions->glDrawArrays(primitive, 0, mesh->VertexCount());
     }
 
     vertexArrayObject->release();
@@ -72,28 +72,28 @@ void IModel::DrawBase(QOpenGLFunctions_4_3_Core* glFunctions)
 
 
 
-void IModel::DrawBase(QOpenGLFunctions* glFunctions)
+void IModel::DrawBase(QOpenGLFunctions* glFunctions, GLenum primitive)
 {
     vertexArrayObject->bind();
 
     if(auto indexed_mesh = dynamic_cast<IndexedMesh*>(mesh.get())) {
-        glFunctions->glDrawElements(GL_POINTS, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
+        glFunctions->glDrawElements(primitive, indexed_mesh->VertexCount(), GL_UNSIGNED_INT, nullptr);
     }
     else {
-        glFunctions->glDrawArrays(GL_TRIANGLES, 0, mesh->VertexCount());
+        glFunctions->glDrawArrays(primitive, 0, mesh->VertexCount());
     }
 
     vertexArrayObject->release();
 }
 
-void IModel::Draw(QOpenGLFunctions* glFunctions)
+void IModel::Draw(QOpenGLFunctions* glFunctions, GLenum primitive)
 {
-    DrawBase(glFunctions);
+    DrawBase(glFunctions, primitive);
 }
 
-void IModel::Draw(QOpenGLFunctions_4_3_Core* glFunctions)
+void IModel::Draw(QOpenGLFunctions_4_3_Core* glFunctions, GLenum primitive)
 {
-    DrawBase(glFunctions);
+    DrawBase(glFunctions, primitive);
 }
 
 void IModel::InitializeBaseModel()

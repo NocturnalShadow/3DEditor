@@ -36,6 +36,7 @@ void Scene::initializeGL()
     scene_view->Initialize();
 
     GenerateUI();
+    GenerateGrid(8);
 }
 
 void Scene::resizeGL(int width, int height)
@@ -46,8 +47,6 @@ void Scene::resizeGL(int width, int height)
 
 void Scene::paintGL()
 {
-    just_a_test();
-
     scene_view->BindShader();
     scene_view->Paint();
     input_manager->Update();
@@ -71,6 +70,16 @@ uint Scene::AddItem(SceneItem&& item)
     scene_model->AddItem(item_ptr);
     scene_view->AddItem(item_ptr);
     return entity_manager->AddItem(item_ptr);
+}
+
+SceneViewCamera* Scene::Camera()
+{
+    return scene_view->Camera();
+}
+
+SceneItem* Scene::Item(uint id)
+{
+    return dynamic_cast<SceneItem*>(entity_manager->Item(id));
 }
 
 uint Scene::AddUserInterfaceItem(const UserInterfaceItem& item)
@@ -128,20 +137,20 @@ void Scene::GenerateUI()
     AddUserInterfaceItem(center);
     ui_items[AddUserInterfaceItem(center)] = UI::CENTER;
 
-    model.SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+    model.SetColor({1.0f, 0.0f, 0.0f, 0.67f});
     UserInterfaceItem x_axis = UserInterfaceItem(model);
     x_axis.Transform().SetScale({0.5f, 0.025f, 0.025f});
     x_axis.Transform().SetPosition({0.5, 0.0, 0.0});
     ui_items[AddUserInterfaceItem(x_axis)] = UI::X_AXIS;
 
-    model.SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+    model.SetColor({0.0f, 1.0f, 0.0f, 0.67f});
     UserInterfaceItem y_axis = UserInterfaceItem(model);
     y_axis.Transform().SetScale({0.5f, 0.025f, 0.025f});
     y_axis.Transform().SetRotation({0.0f, 0.0f, 90.0f});
     y_axis.Transform().SetPosition({0.0, 0.5, 0.0});
     ui_items[AddUserInterfaceItem(y_axis)] = UI::Y_AXIS;
 
-    model.SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+    model.SetColor({0.0f, 0.0f, 1.0f, 0.67f});
     UserInterfaceItem z_axis = UserInterfaceItem(model);
     z_axis.Transform().SetScale({0.5f, 0.025f, 0.025f});
     z_axis.Transform().SetRotation({0.0f, -90.0f, 0.0f});
@@ -154,6 +163,7 @@ void Scene::BindUI()
     for(const auto& item : ui_items)
     {
         auto ui_item = dynamic_cast<UserInterfaceItem*>(entity_manager->Item(item.first));
+        ui_item->BindLocation(selected_item->Transform().Position());
         ui_item->Show();
     }
 }
@@ -167,84 +177,20 @@ void Scene::ReleaseUI()
     }
 }
 
-#include "gl_debug.h"
-
-// =====================================================================
-// ============== Some temporary visual testing functions ==============
-// =====================================================================
-
-void Scene::just_a_test()
+void Scene::GenerateGrid(int size)
 {
-    static uint frame = 0;
-    std::vector<QVector3D> vertices =
+    std::vector<QVector3D> vertices;
+    for(int i = 0; i <= size; ++i)
     {
-        {-1.0,-1.0,1.0},
-        {-1.0,1.0,1.0},
-        { 1.0,1.0,1.0},
-        { 1.0,-1.0,1.0},
-        {-1.0,-1.0,-1.0},
-        {-1.0,1.0,-1.0},
-        { 1.0,1.0,-1.0},
-        { 1.0,-1.0,-1.0},
-    };
-    std::vector<uint> indices =
-    {
-        0, 3, 2,
-        0, 2, 1,
-        2, 3, 7,
-        2, 7, 6,
-        0, 4, 7,
-        0, 7, 3,
-        1, 2, 6,
-        1, 6, 5,
-        4, 5, 6,
-        4, 6, 7,
-        0, 1, 5,
-        0, 5, 4
-    };
-
-    std::vector<QVector4D> colors =
-    {
-        {0.0, 0.0, 0.0, 1.0},
-        {1.0, 0.0, 0.0, 1.0},
-        {1.0, 1.0, 0.0, 1.0},
-        {0.0, 1.0, 0.0, 1.0},
-        {0.0, 0.0, 1.0, 1.0},
-        {1.0, 0.0, 1.0, 1.0},
-        {1.0, 1.0, 1.0, 1.0},
-        {0.0, 1.0, 1.0, 1.0}
-    };
-
-    if(frame == 0)
-    {
-        ColoredModel model(vertices, colors, indices);
-        AddItem(SceneItem(model));
-//        auto item = dynamic_cast<SceneItem*>(entity_manager->Item(2));
-//        item->Transform().Position().setY(2.0f);
-//        auto ui_item = UserInterfaceItem(model);
-//        ui_item.Transform().Scale() = QVector3D{0.5f, 0.5f, 0.5f};
-//        ui_item.Show();
-//        AddUserInterfaceItem(ui_item);
-//        auto item2 = dynamic_cast<UserInterfaceItem*>(entity_manager->Item(3));
-//        item2->Transform().SetRotation({0.0f, 45.0f, 0.0f});
-        scene_view->Camera()->MoveTo({0.0f, 0.0f, 8.0f});
+        vertices.push_back({ size  / 2.0f,     0.0f,   size / 2.0f - i});
+        vertices.push_back({-size  / 2.0f,     0.0f,   size / 2.0f - i});
+        vertices.push_back({ size  / 2.0f - i, 0.0f,   size / 2.0f    });
+        vertices.push_back({ size  / 2.0f - i, 0.0f,  -size / 2.0f    });
     }
-      //scene_view->Camera()->Rotate(0, 0.5f);
-//    scene_model->Item("TheCube").Transform().Rotation().setY(100.0f * frame / 150);
-//    scene_model->Item("TheCube").Transform().SetPosition({0.0f, 0.0f + sin(frame / 60.0f)*2.8f, 4.0f});
-//      scene_model->Item("TheCube").Transform().SetPosition({0.0f, 0.0f, 0.0f});
-//    static float angle = 0;
-//    angle += 0.4f;
-//    QMatrix4x4 rotation;
-//    rotation.rotate(angle, QVector3D{0.0f, 1.0f, 0.0f});
-//    scene_view->Camera()->MoveTo(rotation * QVector3D{0.0f, 0.0f, -8.0f});
 
-//    scene_model->Item("TheCube").Transform().SetPosition({0.0, 2.0, 6.0});
-//    scene_view->Paint();
-//    scene_model->Item("TheCube").Transform().SetPosition({0.0, -4.0, 6.0});
-//    scene_view->Paint();
-
-    frame++;
+    ColoredModel grid(vertices, QVector4D{1.0, 1.0, 1.0, 1.0});
+    auto grid_id = AddItem(SceneItem(grid));
+    dynamic_cast<SceneItem*>(entity_manager->Item(grid_id))->SetPrimitive(GL_LINES);
 }
 
 void Scene::mousePressEvent(QMouseEvent *event)
@@ -304,7 +250,6 @@ void Scene::mouseMoveEvent(QMouseEvent *event)
                 x_value = QVector2D::dotProduct(QVector2D(mouse_pos_delta), QVector2D(screen_axis));
                 if(mode == Mode::ROTATE) {
                     x_projection =  QVector2D(mouse_pos_delta) - QVector2D(screen_axis * x_value);
-                    qDebug() << sgn(x_projection.y());
                 }
                 break;
             case UI::Y_AXIS:
@@ -312,7 +257,6 @@ void Scene::mouseMoveEvent(QMouseEvent *event)
                 y_value = QVector2D::dotProduct(QVector2D(mouse_pos_delta), QVector2D(screen_axis));
                 if(mode == Mode::ROTATE) {
                     y_projection =  QVector2D(mouse_pos_delta) - QVector2D(screen_axis * y_value);
-                    qDebug() << sgn(y_projection.x());
                 }
                 break;
             case UI::Z_AXIS:
@@ -328,9 +272,9 @@ void Scene::mouseMoveEvent(QMouseEvent *event)
         {
             case Mode::MOVE:
             {
-                selected_item->Transform().IncPosition({x_value / 7.0f, 0.0f, 0.0f});
-                selected_item->Transform().IncPosition({0.0f, y_value / 7.0f, 0.0f});
-                selected_item->Transform().IncPosition({0.0f, 0.0f, z_value / 7.0f});
+                selected_item->Transform().IncPosition({sensitivity * x_value / 15.0f, 0.0f, 0.0f});
+                selected_item->Transform().IncPosition({0.0f, sensitivity * y_value / 15.0f, 0.0f});
+                selected_item->Transform().IncPosition({0.0f, 0.0f, sensitivity * z_value / 15.0f});
                 break;
             }
             case Mode::ROTATE:
@@ -370,5 +314,6 @@ void Scene::keyPressEvent(QKeyEvent *event)
 void Scene::wheelEvent(QWheelEvent *event)
 {
     float delta = event->delta() / 600.0f;
+    sensitivity -= delta;
     scene_view->Camera()->Zoom(delta);
 }

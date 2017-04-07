@@ -8,11 +8,11 @@
 class UserInterfaceItem : public IDrawable, public IEntity
 {
 private:
-    std::unique_ptr<IModel> model;
+    std::unique_ptr<IModel> model   = nullptr;
+    ShaderProgram* program          = nullptr;
+    const QVector3D* location       = nullptr;
     Transformation transformation;
-    ShaderProgram* program;
-
-    bool isVisible = false;
+    bool isVisible                  = false;
 
 public:
     UserInterfaceItem() = default;
@@ -35,4 +35,7 @@ public:
     void BindShaderProgram(ShaderProgram* _program) override;
     void Draw(QOpenGLFunctions_4_3_Core* glFunctions) override;
     void Draw(QOpenGLFunctions* glFunctions) override;
+
+    void BindLocation(const QVector3D& _location);
+    void ReleaseLocation();
 };

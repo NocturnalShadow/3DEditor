@@ -13,5 +13,12 @@ private:
 public:
     Display(QWidget *parent = 0);
     ~Display();
+
+public:
+    void AddCube();
+
+public:
+    void resizeEvent(QResizeEvent* event);
 };
+
 
