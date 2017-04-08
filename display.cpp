@@ -5,6 +5,7 @@ Display::Display(QWidget *parent)
 {
     scene.show();
     scene.update();
+    scene.grabKeyboard();
 }
 
 Display::~Display()

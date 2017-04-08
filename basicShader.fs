@@ -1,9 +1,9 @@
-#version 330
+#version 430
 
-varying vec4 vColor;
-uniform vec4 color;
+in vec4 frag_color;
+out vec4 pixel_color;
 
-void main(void)
+void main()
 {
-	gl_FragColor = vColor;
+   pixel_color = frag_color;
 }
