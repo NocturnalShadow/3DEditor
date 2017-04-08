@@ -189,6 +189,7 @@ void Scene::GenerateGrid(int size)
     }
 
     ColoredModel grid(vertices, QVector4D{1.0, 1.0, 1.0, 1.0});
+    grid.ResetNormals();
     auto grid_id = AddItem(SceneItem(grid));
     dynamic_cast<SceneItem*>(entity_manager->Item(grid_id))->SetPrimitive(GL_LINES);
 }

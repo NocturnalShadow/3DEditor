@@ -1,6 +1,6 @@
 #include "scene_item.h"
 
-SceneItem::SceneItem(const IModel &_model, ShaderProgram *_program)
+SceneItem::SceneItem(const IModel& _model, ShaderProgram* _program)
     : model     { _model.Clone() },
       program   { _program       }
 {
@@ -19,15 +19,20 @@ SceneItem::SceneItem(SceneItem&& item)
     : model             { item.model->Move()             },
       transformation    { std::move(item.transformation) },
       program           { std::move(item.program)        },
-      IEntity           { std::move(item) }
+      IEntity           { std::move(item) },
+      IDrawable         { std::move(item) }
 {
+    if(!model->isInitialized()) {
+        model->InitializeModel();
+    }
 }
 
-SceneItem::SceneItem(const SceneItem &item)
+SceneItem::SceneItem(const SceneItem& item)
     : model             { item.model->Clone() },
       transformation    { item.transformation },
       program           { item.program        },
-      IEntity           { item }
+      IEntity           { item },
+      IDrawable         { item }
 {
     model->InitializeModel();
 }

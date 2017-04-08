@@ -19,7 +19,12 @@ IModel::IModel(const IModel& model)
     : mesh{ model.mesh->Clone() },
       vertexArrayObject{ new QOpenGLVertexArrayObject }
 {
+}
 
+IModel::IModel(Mesh&& mesh)
+    : mesh{ mesh.Move() },
+      vertexArrayObject{ new QOpenGLVertexArrayObject }
+{
 }
 
 IModel::IModel(const Mesh& mesh)

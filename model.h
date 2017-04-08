@@ -31,6 +31,7 @@ protected:
     IModel(const IModel& model);
 
 public:
+    IModel(Mesh&& mesh);
     IModel(const Mesh& mesh);
     IModel(const std::vector<QVector3D>& positions);
     IModel(const std::vector<QVector3D>& positions, const std::vector<uint>& indices);
@@ -46,6 +47,8 @@ public:
     virtual IModel* Move()        = 0;
 
     bool isInitialized()   const { return is_initialized;  }
+
+    void ResetNormals() { mesh->ResetNormals(); }
 
 protected:
     void InitializeBaseModel();
@@ -70,9 +73,22 @@ protected:
     ColoredModel(const ColoredModel& model) = default;
 
 public:
+    ColoredModel(Mesh&& _mesh)
+        : IModel{ std::move(_mesh) }
+    {
+         SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+    }
+    ColoredModel(const Mesh& _mesh)
+        : IModel{ _mesh }
+    {
+         SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+    }
     ColoredModel(const std::vector<QVector3D>& positions, std::vector<QVector4D> colors = std::vector<QVector4D>{})
         : IModel{ positions }, colors{ colors }
     {
+        if(colors.empty()) {
+            SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+        }
     }
     ColoredModel(const std::vector<QVector3D>& positions, const QVector4D& color)
         : IModel{ positions }
@@ -86,6 +102,7 @@ public:
     ColoredModel(const std::vector<QVector3D>& positions, const std::vector<uint>& indices)
         : IModel{ positions, indices }
     {
+         SetColor({1.0f, 1.0f, 1.0f, 1.0f});
     }
     ColoredModel(const std::vector<QVector3D>& positions, const std::vector<uint>& indices, const QVector4D& color)
         : IModel{ positions, indices }

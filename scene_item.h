@@ -40,5 +40,11 @@ public:
     Transformation& Transform() {
         return transformation;
     }
+    IModel* Model() {
+        return model.get();
+    }
+    ColoredModel* toColoredModel() {
+        return dynamic_cast<ColoredModel*>(model.get());
+    }
 };
 

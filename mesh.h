@@ -11,6 +11,9 @@ protected:
     std::vector<QVector3D> positions;
     std::vector<QVector3D> normals;
 
+private:
+    bool is_normalized   = false;
+
 protected:
     Mesh(Mesh&& mesh)      = default;
     Mesh(const Mesh& mesh) = default;
@@ -25,9 +28,29 @@ public:
     {
     }
 
+    Mesh(std::vector<QVector3D>&& _positions, std::vector<QVector3D>&& normals)
+        : positions{std::move(_positions)}, normals{ std::move(normals) }, is_normalized{ true }
+    {
+    }
+    Mesh(const std::vector<QVector3D>& _positions, const std::vector<QVector3D>& normals)
+        : positions{_positions}, normals{ normals }, is_normalized{ true }
+    {
+    }
+
 public:
-    void InitializeMesh() {
-        CalculateNormals();
+    void InitializeMesh()
+    {
+        if(!is_normalized)
+        {
+            CalculateNormals();
+            is_normalized = true;
+        }
+    }
+    void ResetNormals()
+    {
+        normals.clear();
+        normals.resize(positions.size());
+        is_normalized = false;
     }
 
     size_t SizeOfPositions()       const { return positions.size() * sizeof(positions[0]);  }
@@ -41,12 +64,15 @@ public:
     {
         Mesh* mesh                   = new Mesh(positions);
         mesh->normals                = normals;
+        mesh->is_normalized          = is_normalized;
         return mesh;
     }
     virtual Mesh* Move()
     {
         Mesh* mesh                   = new Mesh(std::move(positions));
         mesh->normals                = std::move(normals);
+        mesh->is_normalized          = is_normalized;
+        is_normalized                = false;
         return mesh;
     }
 
@@ -70,6 +96,14 @@ public:
     }
     IndexedMesh(const std::vector<QVector3D>& _positions, const std::vector<uint>& _indices)
         : Mesh{_positions}, indices{_indices}
+    {
+    }
+    IndexedMesh(std::vector<QVector3D>&& _positions, std::vector<QVector3D>&& _normals, std::vector<uint>&& _indices)
+        : Mesh{std::move(_positions), std::move(_normals)}, indices{std::move(_indices)}
+    {
+    }
+    IndexedMesh(const std::vector<QVector3D>& _positions, const std::vector<QVector3D>& _normals, const std::vector<uint>& _indices)
+        : Mesh{_positions, _normals}, indices{_indices}
     {
     }
 

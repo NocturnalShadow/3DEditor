@@ -1,5 +1,7 @@
 #include "display.h"
 
+#include "model_loader.h"
+
 Display::Display(QWidget *parent)
     : QWidget(parent), scene(this)
 {
@@ -53,8 +55,14 @@ void Display::AddCube()
         {1.0, 1.0, 1.0, 1.0},
         {0.0, 1.0, 1.0, 1.0}
     };
-    ColoredModel model(vertices, colors, indices);
-    auto cube_id = scene.AddItem(SceneItem(model));
+    ColoredModel cube_model(vertices, colors, indices);
+    auto cube_id = scene.AddItem(SceneItem(cube_model));
+
+    //ColoredModel* sphere = ModelLoader::LoadModel("sphere.obj")->toColoredModel();
+    //sphere->SetColor({1.0f, 0.0f, 1.0f, 1.0f});
+
+    auto sphere_id = scene.AddItem(SceneItem(*ModelLoader::LoadModel("sphere.obj")->toColoredModel()));
+    scene.Item(sphere_id)->toColoredModel()->SetColor({1.0f, 0.0f, 1.0f, 1.0f});
 }
 
 void Display::resizeEvent(QResizeEvent* event)

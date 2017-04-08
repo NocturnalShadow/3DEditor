@@ -5,7 +5,9 @@
 UserInterfaceItem::UserInterfaceItem(IModel&& _model)
     : model{ _model.Move() }
 {
-    if(!model->isInitialized()) {
+    if(!model->isInitialized())
+    {
+        model->ResetNormals();
         model->InitializeModel();
     }
 }
@@ -31,7 +33,11 @@ UserInterfaceItem::UserInterfaceItem(const IModel& _model, ShaderProgram* _progr
     : model     { _model.Clone() },
       program   { _program       }
 {
-    model->InitializeModel();
+    if(!_model.isInitialized())
+    {
+        model->ResetNormals();
+        model->InitializeModel();
+    }
 }
 
 UserInterfaceItem& UserInterfaceItem::operator=(const UserInterfaceItem& item)

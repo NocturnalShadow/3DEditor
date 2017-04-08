@@ -7,3 +7,5 @@ Alpha v1.0
 ![alt_tag](https://github.com/NocturnalShadow/3DEditor/blob/master/ScreenShots/Alpha.png)
 Beta v1.0
 ![alt_tag](https://github.com/NocturnalShadow/3DEditor/blob/master/ScreenShots/Beta_1_0.png)
+Beta v2.0
+![alt_tag](https://github.com/NocturnalShadow/3DEditor/blob/master/ScreenShots/Beta_2_0.png)
