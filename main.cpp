@@ -1,21 +1,16 @@
 #include "display.h"
 
-#include <QApplication>
 #include <QFile>
 #include <QDebug>
-
-
-#include <QMatrix4x4>
-#include <QQuaternion>
+#include <QApplication>
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    Display dispaly;
-    dispaly.show();
-    dispaly.AddCube();
+    Display display;
+    display.show();
 
     return a.exec();
 }

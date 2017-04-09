@@ -23,37 +23,46 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+INCLUDEPATH += "./include"
 INCLUDEPATH += "./Assimp/include"
 
 LIBS += -L"$$_PRO_FILE_PWD_/Assimp/lib64" -lassimp-vc140-mt
 
-SOURCES +=  main.cpp            \
-            display.cpp         \
-            scene.cpp           \
-            shader_program.cpp \
-    mesh.cpp \
-    model.cpp \
-    gl_debug.cpp \
-    scene_view.cpp \
-    scene_item.cpp \
-    ui_item.cpp \
-    entity.cpp \
-    input_manager.cpp
+HEADERS  += \
+    include/camera.h            \
+    include/display.h           \
+    include/drawable.h          \
+    include/entity.h            \
+    include/gl_debug.h          \
+    include/input_manager.h     \
+    include/mathematics.h       \
+    include/mesh.h              \
+    include/model.h             \
+    include/model_loader.h      \
+    include/scene.h             \
+    include/scene_item.h        \
+    include/scene_model.h       \
+    include/scene_view.h        \
+    include/shader_program.h    \
+    include/transform.h         \
+    include/ui_display.h        \
+    include/ui_item.h
 
-HEADERS  += display.h           \
-            scene.h             \
-            camera.h            \
-            shader_program.h \
-            transform.h \
-    mesh.h \
-    model.h \
-    gl_debug.h \
-    scene_item.h \
-    scene_view.h \
-    scene_model.h \
-    drawable.h \
-    ui_item.h \
-    input_manager.h \
-    entity.h \
-    mathematics.h \
-    model_loader.h
+SOURCES +=  main.cpp            \
+    Source/display.cpp          \
+    Source/entity.cpp           \
+    Source/gl_debug.cpp         \
+    Source/input_manager.cpp    \
+    Source/mesh.cpp             \
+    Source/model.cpp            \
+    Source/scene.cpp            \
+    Source/scene_item.cpp       \
+    Source/scene_view.cpp       \
+    Source/shader_program.cpp   \
+    Source/ui_item.cpp
+
+FORMS += \
+    display.ui
+
+RESOURCES += \
+    shaders.qrc
